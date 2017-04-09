@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import persistencia.jb.Lista;
 
 /**
@@ -14,15 +17,31 @@ import persistencia.jb.Lista;
 public class ListaDao {
 
     /**
+     * DBHelper se instancia sólo una vez porque getWritableDatabase es costoso si
+     * DBhelper está cerrado.
+     * Deberá cerrarse en onDestroy():
+     *  protected void onDestroy() {
+     *      ListaDao.close();
+     *      super.onDestroy();
+     *  }
+     */
+    static DBHelper mDBHelper = null;
+
+    public ListaDao(Context context) {
+        if (mDBHelper == null) mDBHelper = new DBHelper(ListaContract.getInstance(), context);
+    }
+
+    public void close() {
+        if (mDBHelper != null) mDBHelper.close();
+    }
+
+    /**
      * Añadir un registro de la tabla Lista.    Si la operación tiene éxito cambia el ID en lista.
-     * @param context El contexto de la aplicación.
      * @param lista El java bean Lista.
      * @return True o False según si la operación se realizó correctamente.
      */
 
-    public Boolean insert(Context context, Lista lista) {
-
-        DBHelper mDBHelper = new DBHelper(ListaContract.getInstance(), context);
+    public Boolean insert(Lista lista) {
 
         // Gets the data repository in write mode
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
@@ -42,14 +61,12 @@ public class ListaDao {
 
     /**
      * Leer un registro de la tabla Lista a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la lista.
      * @return El javabean lista o null si no se encontró el ID.
      */
-    public Lista read(Context context, Long id) {
-        DBHelper mDbHelper = new DBHelper(ListaContract.getInstance(), context);
+    public Lista read(Long id) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -97,15 +114,12 @@ public class ListaDao {
 
     /**
      * Elimina un registro de la tabla Lista a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la lista.
      * @return True o False según si la operación se realizó correctamente.
      */
-    public Boolean delete(Context context, Long id) {
+    public Boolean delete(Long id) {
 
-        DBHelper mDbHelper = new DBHelper(ListaContract.getInstance(), context);
-
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define 'where' part of query.
         String selection = ListaContract.ListaEntry._ID + " = ?";
@@ -119,13 +133,11 @@ public class ListaDao {
 
     /**
      * Modifica un registro de la tabla Lista a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param lista El java bean que contiene los datos a actualizar.
      */
-    public Boolean update(Context context, Lista lista) {
+    public Boolean update(Lista lista) {
 
-        DBHelper mDbHelper = new DBHelper(ListaContract.getInstance(), context);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // New value for one column
         ContentValues values = new ContentValues();
@@ -144,4 +156,155 @@ public class ListaDao {
 
         return count > 0;
     }
+
+    /**
+     * Obtiene una lista de artículos filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param fecha La fecha por la cual filtrar el resultado. Si es null, no se filtrará por este campo.
+     *              Debe estar en formato "AAAA-MM-dd".
+     * @param fechaFin La fecha tope de filtrado.  Si no es null, se filtrarán los resultados entre
+     *               fecha y fecha_.  Debe estar en formato "AAAA-MM-dd".
+     * @param id_super El código de un supermercado.  Si es 0 no se filtra por este campo.
+     * @return an ArrayList of Lista
+     *
+     */
+    public ArrayList<Lista> listado(String fecha, String fechaFin, Long id_super) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                ListaContract.ListaEntry._ID,
+                ListaContract.ListaEntry.COLUMN_NAME_FECHA,
+                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (fecha != null) {
+            if (fechaFin != null) {
+                // filtro por rango
+                selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_FECHA + " >= ?");
+                selectionArgs.add(fecha);
+                selection = selection.concat(" AND ");
+                selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_FECHA + " <= ?");
+                selectionArgs.add(fechaFin);
+            } else {
+                // filtro por una fecha exacta
+                selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_FECHA + " = ?");
+                selectionArgs.add(fecha);
+            }
+
+        }
+        if (id_super > 0) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER + " =?");
+            selectionArgs.add(id_super.toString());
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                ListaContract.ListaEntry.TABLE_NAME,  // The table to query
+                projection,                                 // The columns to return
+                selection,                                  // The columns for the WHERE clause
+                selectionArgs.toArray(S),                   // The values for the WHERE clause
+                null,                                       // don't group the rows
+                null,                                       // don't filter by row groups
+                null                                        // The sort order
+        );
+
+        ArrayList<Lista> listLista = new ArrayList<Lista>();
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+
+            while (!c.isAfterLast()) {
+                Lista lista = new Lista();
+                lista.setId(c.getLong(c.getColumnIndex(ListaContract.ListaEntry._ID)));
+                lista.setFechaFormat(
+                        c.getString(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_FECHA))
+                );
+                lista.setId_super(
+                        c.getLong(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER))
+                );
+                listLista.add(lista);
+                c.moveToNext();
+            }
+        }
+        c.close();
+        return listLista;
+    }
+
+    /**
+     * Obtiene un cursor de una lista de artículos filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param fecha La fecha por la cual filtrar el resultado. Si es null, no se filtrará por este campo.
+     *              Debe estar en formato "AAAA-MM-dd".
+     * @param fechaFin La fecha tope de filtrado.  Si no es null, se filtrarán los resultados entre
+     *               fecha y fecha_.  Debe estar en formato "AAAA-MM-dd".
+     * @param id_super El código de un supermercado.  Si es 0 no se filtra por este campo.
+     * @return un cursor de Lista
+     *
+     */
+    public Cursor getCursor(String fecha, String fechaFin, Long id_super) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                ListaContract.ListaEntry._ID,
+                ListaContract.ListaEntry.COLUMN_NAME_FECHA,
+                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (fecha != null) {
+            if (fechaFin != null) {
+                // filtro por rango
+                selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_FECHA + " >= ?");
+                selectionArgs.add(fecha);
+                selection = selection.concat(" AND ");
+                selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_FECHA + " <= ?");
+                selectionArgs.add(fechaFin);
+            } else {
+                // filtro por una fecha exacta
+                selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_FECHA + " = ?");
+                selectionArgs.add(fecha);
+            }
+
+        }
+        if (id_super > 0) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER + " =?");
+            selectionArgs.add(id_super.toString());
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                    ListaContract.ListaEntry.TABLE_NAME,  // The table to query
+                    projection,                                 // The columns to return
+                    selection,                                  // The columns for the WHERE clause
+                    selectionArgs.toArray(S),                   // The values for the WHERE clause
+                    null,                                       // don't group the rows
+                    null,                                       // don't filter by row groups
+                    null                                        // The sort order
+            );
+
+        return c;
+    }
+
 }

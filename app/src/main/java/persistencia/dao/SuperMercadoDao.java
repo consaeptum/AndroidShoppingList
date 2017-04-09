@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import persistencia.jb.SuperMercado;
 
 /**
@@ -14,16 +17,32 @@ import persistencia.jb.SuperMercado;
 public class SuperMercadoDao {
 
     /**
+     * DBHelper se instancia sólo una vez porque getWritableDatabase es costoso si
+     * DBhelper está cerrado.
+     * Deberá cerrarse en onDestroy():
+     *  protected void onDestroy() {
+     *      SuperMercadoDao.close();
+     *      super.onDestroy();
+     *  }
+     */
+    static DBHelper mDBHelper = null;
+
+    public SuperMercadoDao(Context context) {
+        if (mDBHelper == null) mDBHelper = new DBHelper(SuperMercadoContract.getInstance(), context);
+    }
+
+    public void close() {
+        if (mDBHelper != null) mDBHelper.close();
+    }
+
+    /**
      * Añadir un registro de la tabla SuperMercado.  Si la operación tiene éxito cambia el ID en
      * superMercado.
-     * @param context El contexto de la aplicación.
      * @param superMercado El java bean SuperMercado.
      * @return True o False según si la operación se realizó correctamente.
      */
 
-    public Boolean insert(Context context, SuperMercado superMercado) {
-
-        DBHelper mDBHelper = new DBHelper(SuperMercadoContract.getInstance(), context);
+    public Boolean insert(SuperMercado superMercado) {
 
         // Gets the data repository in write mode
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
@@ -42,14 +61,12 @@ public class SuperMercadoDao {
 
     /**
      * Leer un registro de la tabla SuperMercado a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la SuperMercado.
      * @return El javabean SuperMercado o null si no se encontró el ID.
      */
-    public SuperMercado read(Context context, Long id) {
-        DBHelper mDbHelper = new DBHelper(SuperMercadoContract.getInstance(), context);
+    public SuperMercado read(Long id) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -93,14 +110,12 @@ public class SuperMercadoDao {
 
     /**
      * Leer un registro de la tabla SuperMercado a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param superMercado El identificador del SuperMercado.
      * @return El javabean SuperMercado o null si no se encontró el ID.
      */
-    public SuperMercado read(Context context, String superMercado) {
-        DBHelper mDbHelper = new DBHelper(SuperMercadoContract.getInstance(), context);
+    public SuperMercado read(String superMercado) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -145,15 +160,12 @@ public class SuperMercadoDao {
 
     /**
      * Elimina un registro de la tabla SuperMercado a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la SuperMercado.
      * @return True o False según si la operación se realizó correctamente.
      */
-    public Boolean delete(Context context, Long id) {
+    public Boolean delete(Long id) {
 
-        DBHelper mDbHelper = new DBHelper(SuperMercadoContract.getInstance(), context);
-
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define 'where' part of query.
         String selection = SuperMercadoContract.SuperMercadoEntry._ID + " = ?";
@@ -167,13 +179,11 @@ public class SuperMercadoDao {
 
     /**
      * Modifica un registro de la tabla SuperMercado a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param SuperMercado El java bean que contiene los datos a actualizar.
      */
-    public Boolean update(Context context, SuperMercado SuperMercado) {
+    public Boolean update(SuperMercado SuperMercado) {
 
-        DBHelper mDbHelper = new DBHelper(SuperMercadoContract.getInstance(), context);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // New value for one column
         ContentValues values = new ContentValues();
@@ -191,4 +201,112 @@ public class SuperMercadoDao {
 
         return count > 0;
     }
+
+    /**
+     * Obtiene una lista de superMercados filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
+     *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @return an ArrayList of SuperMercado
+     *
+     */
+    public ArrayList<SuperMercado> listado(String nombre) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                SuperMercadoContract.SuperMercadoEntry._ID,
+                SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE,
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (nombre != null) {
+            selection = selection.concat(SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE + " LIKE ?");
+            selectionArgs.add(nombre + "%");
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + SuperMercadoContract.SuperMercadoEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                SuperMercadoContract.SuperMercadoEntry.TABLE_NAME,  // The table to query
+                projection,                                 // The columns to return
+                selection,                                  // The columns for the WHERE clause
+                selectionArgs.toArray(S),                   // The values for the WHERE clause
+                null,                                       // don't group the rows
+                null,                                       // don't filter by row groups
+                null                                        // The sort order
+        );
+
+        ArrayList<SuperMercado> listSuperMercado = new ArrayList<SuperMercado>();
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+
+            while (!c.isAfterLast()) {
+                SuperMercado superMercado = new SuperMercado();
+                superMercado.setId(c.getLong(c.getColumnIndex(SuperMercadoContract.SuperMercadoEntry._ID)));
+                superMercado.setNombre(
+                        c.getString(c.getColumnIndex(SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE))
+                );
+                listSuperMercado.add(superMercado);
+                c.moveToNext();
+            }
+        }
+        c.close();
+        return listSuperMercado;
+    }
+
+    /**
+     * Obtiene un cursor de una lista de superMercados filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
+     *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @return un cursor de Supermercado
+     *
+     */
+    public Cursor getCursor(String nombre) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                SuperMercadoContract.SuperMercadoEntry._ID,
+                SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE,
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (nombre != null) {
+            selection = selection.concat(SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE + " LIKE ?");
+            selectionArgs.add(nombre + "%");
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + SuperMercadoContract.SuperMercadoEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                    SuperMercadoContract.SuperMercadoEntry.TABLE_NAME,  // The table to query
+                    projection,                                 // The columns to return
+                    selection,                                  // The columns for the WHERE clause
+                    selectionArgs.toArray(S),                   // The values for the WHERE clause
+                    null,                                       // don't group the rows
+                    null,                                       // don't filter by row groups
+                    null                                        // The sort order
+            );
+
+        return c;
+    }
+
 }

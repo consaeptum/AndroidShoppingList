@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import persistencia.jb.Articulo;
 
 /**
@@ -14,15 +17,31 @@ import persistencia.jb.Articulo;
 public class ArticuloDao {
 
     /**
+     * DBHelper se instancia sólo una vez porque getWritableDatabase es costoso si
+     * DBhelper está cerrado.
+     * Deberá cerrarse en onDestroy():
+     *  protected void onDestroy() {
+     *      ArticuloDao.close();
+     *      super.onDestroy();
+     *  }
+     */
+    static DBHelper mDBHelper = null;
+
+    public ArticuloDao(Context context) {
+        if (mDBHelper == null) mDBHelper = new DBHelper(ArticuloContract.getInstance(), context);
+    }
+
+    public void close() {
+        if (mDBHelper != null) mDBHelper.close();
+    }
+
+    /**
      * Añadir un registro de la tabla Articulo.  Si la operación tiene éxito cambia el ID en articulo.
-     * @param context El contexto de la aplicación.
      * @param articulo El java bean Articulo.
      * @return True o False según si la operación se realizó correctamente.
      */
 
-    public Boolean insert(Context context, Articulo articulo) {
-
-        DBHelper mDBHelper = new DBHelper(ArticuloContract.getInstance(), context);
+    public Boolean insert(Articulo articulo) {
 
         // Gets the data repository in write mode
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
@@ -44,14 +63,12 @@ public class ArticuloDao {
 
     /**
      * Leer un registro de la tabla Articulo a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la articulo.
      * @return El javabean articulo o null si no se encontró el ID.
      */
-    public Articulo read(Context context, Long id) {
-        DBHelper mDbHelper = new DBHelper(ArticuloContract.getInstance(), context);
+    public Articulo read(Long id) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -107,14 +124,12 @@ public class ArticuloDao {
 
     /**
      * Leer un registro de la tabla Articulo a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param articulo El identificador o código de la articulo.
      * @return El javabean articulo o null si no se encontró el ID.
      */
-    public Articulo read(Context context, String articulo) {
-        DBHelper mDbHelper = new DBHelper(ArticuloContract.getInstance(), context);
+    public Articulo read(String articulo) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -171,15 +186,12 @@ public class ArticuloDao {
 
     /**
      * Elimina un registro de la tabla Articulo a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la articulo.
      * @return True o False según si la operación se realizó correctamente.
      */
-    public Boolean delete(Context context, Long id) {
+    public Boolean delete(Long id) {
 
-        DBHelper mDbHelper = new DBHelper(ArticuloContract.getInstance(), context);
-
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define 'where' part of query.
         String selection = ArticuloContract.ArticuloEntry._ID + " = ?";
@@ -193,13 +205,11 @@ public class ArticuloDao {
 
     /**
      * Modifica un registro de la tabla Articulo a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param articulo El java bean que contiene los datos a actualizar.
      */
-    public Boolean update(Context context, Articulo articulo) {
+    public Boolean update(Articulo articulo) {
 
-        DBHelper mDbHelper = new DBHelper(ArticuloContract.getInstance(), context);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // New value for one column
         ContentValues values = new ContentValues();
@@ -220,4 +230,171 @@ public class ArticuloDao {
 
         return count > 0;
     }
+
+    /**
+     * Obtiene una lista de artículos filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
+     *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @param descrip Una parte de la descripción que deberá contener los artículos seleccionados
+     *                en cualquier parte del texto. Si es null, no se filtrará por este campo.
+     * @param medida Un carácter que especifica la media (U, L, K).  Si es null o no corresponde
+     *               a U L K, no se filtrará por este campo.
+     * @param id_familia El código de una familia.  Si es 0 no se filtra por este campo.
+     * @return an ArrayList of Articulo
+     *
+     */
+    public ArrayList<Articulo> listado(String nombre, String descrip, Character medida, Long id_familia) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                ArticuloContract.ArticuloEntry._ID,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (nombre != null) {
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE + " LIKE ?");
+            selectionArgs.add(nombre + "%");
+        }
+        if (descrip != null) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION + " LIKE ?");
+            selectionArgs.add("%" + descrip + "%");
+        }
+        if (medida != null) {
+            if ("ULK".indexOf(Character.toUpperCase(medida)) >= 0) {
+                if (selection.length() > 0) selection = selection.concat(" AND ");
+                selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA + " =?");
+                selectionArgs.add(medida.toString().toUpperCase());
+            }
+        }
+        if (id_familia > 0) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA + " =?");
+            selectionArgs.add(id_familia.toString());
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                ArticuloContract.ArticuloEntry.TABLE_NAME,  // The table to query
+                projection,                                 // The columns to return
+                selection,                                  // The columns for the WHERE clause
+                selectionArgs.toArray(S),                   // The values for the WHERE clause
+                null,                                       // don't group the rows
+                null,                                       // don't filter by row groups
+                null                                        // The sort order
+        );
+
+        ArrayList<Articulo> listArticulo = new ArrayList<Articulo>();
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+
+            while (!c.isAfterLast()) {
+                Articulo articulo = new Articulo();
+                articulo.setId(c.getLong(c.getColumnIndex(ArticuloContract.ArticuloEntry._ID)));
+                articulo.setNombre(
+                        c.getString(c.getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE))
+                );
+                articulo.setDescripcion(
+                        c.getString(c.getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION))
+                );
+                articulo.setMedida(
+                        c.getString(c.getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA)).charAt(0)
+                );
+                articulo.setId_familia(
+                        c.getLong(c.getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA))
+                );
+                listArticulo.add(articulo);
+                c.moveToNext();
+            }
+        }
+        c.close();
+        return listArticulo;
+    }
+
+    /**
+     * Obtiene un cusor de una lista de artículos filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
+     *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @param descrip Una parte de la descripción que deberá contener los artículos seleccionados
+     *                en cualquier parte del texto. Si es null, no se filtrará por este campo.
+     * @param medida Un carácter que especifica la media (U, L, K).  Si es null o no corresponde
+     *               a U L K, no se filtrará por este campo.
+     * @param id_familia El código de una familia.  Si es 0 no se filtra por este campo.
+     * @return un cursor de Articulo
+     *
+     */
+    public Cursor getCursor(String nombre, String descrip, Character medida, Long id_familia) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                ArticuloContract.ArticuloEntry._ID,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (nombre != null) {
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE + " LIKE ?");
+            selectionArgs.add(nombre + "%");
+        }
+        if (descrip != null) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION + " LIKE ?");
+            selectionArgs.add("%" + descrip + "%");
+        }
+        if (medida != null) {
+            if ("ULK".indexOf(Character.toUpperCase(medida)) >= 0) {
+                if (selection.length() > 0) selection = selection.concat(" AND ");
+                selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA + " =?");
+                selectionArgs.add(medida.toString().toUpperCase());
+            }
+        }
+        if (id_familia > 0) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA + " =?");
+            selectionArgs.add(id_familia.toString());
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                    ArticuloContract.ArticuloEntry.TABLE_NAME,  // The table to query
+                    projection,                                 // The columns to return
+                    selection,                                  // The columns for the WHERE clause
+                    selectionArgs.toArray(S),                   // The values for the WHERE clause
+                    null,                                       // don't group the rows
+                    null,                                       // don't filter by row groups
+                    null                                        // The sort order
+            );
+
+        return c;
+    }
+
 }

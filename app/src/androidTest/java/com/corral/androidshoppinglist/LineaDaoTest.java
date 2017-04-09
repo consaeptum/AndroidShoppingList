@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+
 import persistencia.dao.DBHelper;
 import persistencia.dao.LineaContract;
 import persistencia.dao.LineaDao;
@@ -41,21 +43,40 @@ public class LineaDaoTest {
         Context appContext = getTargetContext();
 
         Linea f = new Linea();
-        LineaDao fd = new LineaDao();
+        LineaDao fd = new LineaDao(appContext);
 
         f.setCantidad(44f);
-        assertTrue(fd.insert(appContext, f));
+        assertTrue(fd.insert(f));
 
-        f = fd.read(appContext, f.getId());
+        f = fd.read(f.getId());
         assertTrue(f != null);
 
         f.setCantidad(88f);
-        fd.update(appContext, f);
+        fd.update(f);
 
-        f = fd.read(appContext, f.getId());
+        f = fd.read(f.getId());
         assertTrue(f.getCantidad() == 88f);
 
-        assertTrue(fd.delete(appContext, f.getId()));
+        assertTrue(fd.delete(f.getId()));
+
+        f.setPvp(1.24f); f.setCantidad(1f); f.setId_articulo(1L); f.setId_lista(4L);
+        assertTrue(fd.insert(f));
+
+        f.setPvp(1.25f); f.setCantidad(2f); f.setId_articulo(2L); f.setId_lista(5L);
+        assertTrue(fd.insert(f));
+
+        f.setPvp(1.26f); f.setCantidad(3f); f.setId_articulo(3L); f.setId_lista(5L);
+        assertTrue(fd.insert(f));
+
+        ArrayList<Linea> listaLinea =  fd.listado(5L,3L);
+
+        for(Linea a: listaLinea) {
+            System.out.println("###### Linea: " + a.getId() + "-" + a.getPvp() + "-" + a.getCantidad() +
+                    "-" + a.getId_articulo() + "-" + a.getId_lista());
+        }
+
+        assertTrue(listaLinea.size() == 1);
+        assertTrue(listaLinea.get(0).getId() == 3L);
 
     }
 

@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+
 import persistencia.dao.DBHelper;
 import persistencia.dao.FamiliaContract;
 import persistencia.dao.FamiliaDao;
@@ -41,21 +43,39 @@ public class FamiliaDaoTest {
         Context appContext = getTargetContext();
 
         Familia f = new Familia();
-        FamiliaDao fd = new FamiliaDao();
+        FamiliaDao fd = new FamiliaDao(appContext);
 
         f.setNombre("Nombre de Familia de prueba UPDATER");
-        assertTrue(fd.insert(appContext, f));
+        assertTrue(fd.insert(f));
 
-        f = fd.read(appContext, "Nombre de Familia de prueba UPDATER");
+        f = fd.read("Nombre de Familia de prueba UPDATER");
         assertTrue(f != null);
 
         f.setNombre("Nombre de Familia de prueba UPDATE");
-        fd.update(appContext, f);
+        fd.update(f);
 
-        f = fd.read(appContext, "Nombre de Familia de prueba UPDATE");
+        f = fd.read("Nombre de Familia de prueba UPDATE");
         assertTrue(f != null);
 
-        assertTrue(fd.delete(appContext, f.getId()));
+        assertTrue(fd.delete(f.getId()));
+
+        f.setNombre("articuloPrueba1");
+        assertTrue(fd.insert(f));
+
+        f.setNombre("articuloPrueba2");
+        assertTrue(fd.insert(f));
+
+        f.setNombre("articuloPrueba3");
+        assertTrue(fd.insert(f));
+
+        ArrayList<Familia> listaFamilia =  fd.listado("articulo");
+
+        for(Familia a: listaFamilia) {
+            System.out.println("###### Familia: " + a.getId() + "-" + a.getNombre());
+        }
+
+        assertTrue(listaFamilia.size() == 3);
+        assertTrue(listaFamilia.get(0).getId() == 1L);
 
     }
 

@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import persistencia.jb.Familia;
 
 /**
@@ -14,15 +17,31 @@ import persistencia.jb.Familia;
 public class FamiliaDao {
 
     /**
+     * DBHelper se instancia sólo una vez porque getWritableDatabase es costoso si
+     * DBhelper está cerrado.
+     * Deberá cerrarse en onDestroy():
+     *  protected void onDestroy() {
+     *      FamiliaDao.close();
+     *      super.onDestroy();
+     *  }
+     */
+    static DBHelper mDBHelper = null;
+
+    public FamiliaDao(Context context) {
+        if (mDBHelper == null) mDBHelper = new DBHelper(FamiliaContract.getInstance(), context);
+    }
+
+    public void close() {
+        if (mDBHelper != null) mDBHelper.close();
+    }
+
+    /**
      * Añadir un registro de la tabla Familia.  Si la operación tiene éxito cambia el ID en familia.
-     * @param context El contexto de la aplicación.
      * @param familia El java bean Familia.
      * @return True o False según si la operación se realizó correctamente.
      */
 
-    public Boolean insert(Context context, Familia familia) {
-
-        DBHelper mDBHelper = new DBHelper(FamiliaContract.getInstance(), context);
+    public Boolean insert(Familia familia) {
 
         // Gets the data repository in write mode
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
@@ -41,14 +60,12 @@ public class FamiliaDao {
 
     /**
      * Leer un registro de la tabla Familia a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la familia.
      * @return El javabean familia o null si no se encontró el ID.
      */
-    public Familia read(Context context, Long id) {
-        DBHelper mDbHelper = new DBHelper(FamiliaContract.getInstance(), context);
+    public Familia read(Long id) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -92,14 +109,12 @@ public class FamiliaDao {
 
     /**
      * Leer un registro de la tabla Familia a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param nombre El nombre que identifica la familia.
      * @return El javabean familia o null si no se encontró el ID.
      */
-    public Familia read(Context context, String nombre) {
-        DBHelper mDbHelper = new DBHelper(FamiliaContract.getInstance(), context);
+    public Familia read(String nombre) {
 
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
@@ -141,15 +156,12 @@ public class FamiliaDao {
 
     /**
      * Elimina un registro de la tabla Familia a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param id El identificador o código de la familia.
      * @return True o False según si la operación se realizó correctamente.
      */
-    public Boolean delete(Context context, Long id) {
+    public Boolean delete(Long id) {
 
-        DBHelper mDbHelper = new DBHelper(FamiliaContract.getInstance(), context);
-
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define 'where' part of query.
         String selection = FamiliaContract.FamiliaEntry._ID + " = ?";
@@ -163,13 +175,11 @@ public class FamiliaDao {
 
     /**
      * Modifica un registro de la tabla Familia a partir del ID.
-     * @param context El contexto de la aplicación.
      * @param familia El java bean que contiene los datos a actualizar.
      */
-    public Boolean update(Context context, Familia familia) {
+    public Boolean update(Familia familia) {
 
-        DBHelper mDbHelper = new DBHelper(FamiliaContract.getInstance(), context);
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // New value for one column
         ContentValues values = new ContentValues();
@@ -187,4 +197,111 @@ public class FamiliaDao {
 
         return count > 0;
     }
+
+    /**
+     * Obtiene una lista de familias filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
+     *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @return an ArrayList of Familia
+     *
+     */
+    public ArrayList<Familia> listado(String nombre) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                FamiliaContract.FamiliaEntry._ID,
+                FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE,
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (nombre != null) {
+            selection = selection.concat(FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE + " LIKE ?");
+            selectionArgs.add(nombre + "%");
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + FamiliaContract.FamiliaEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                FamiliaContract.FamiliaEntry.TABLE_NAME,  // The table to query
+                projection,                                 // The columns to return
+                selection,                                  // The columns for the WHERE clause
+                selectionArgs.toArray(S),                   // The values for the WHERE clause
+                null,                                       // don't group the rows
+                null,                                       // don't filter by row groups
+                null                                        // The sort order
+        );
+
+        ArrayList<Familia> listFamilia = new ArrayList<Familia>();
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+
+            while (!c.isAfterLast()) {
+                Familia familia = new Familia();
+                familia.setId(c.getLong(c.getColumnIndex(FamiliaContract.FamiliaEntry._ID)));
+                familia.setNombre(
+                        c.getString(c.getColumnIndex(FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE))
+                );
+                listFamilia.add(familia);
+                c.moveToNext();
+            }
+        }
+        c.close();
+        return listFamilia;
+    }
+
+    /**
+     * Obtiene el cursor de una lista de familias filtrado por los campos de los parametros.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
+     *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @return un cursor de Familia
+     *
+     */
+    public Cursor getCursor(String nombre) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                FamiliaContract.FamiliaEntry._ID,
+                FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE,
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (nombre != null) {
+            selection = selection.concat(FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE + " LIKE ?");
+            selectionArgs.add(nombre + "%");
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT * FROM " + FamiliaContract.FamiliaEntry.TABLE_NAME, null);
+        else
+            c = db.query(
+                    FamiliaContract.FamiliaEntry.TABLE_NAME,  // The table to query
+                    projection,                                 // The columns to return
+                    selection,                                  // The columns for the WHERE clause
+                    selectionArgs.toArray(S),                   // The values for the WHERE clause
+                    null,                                       // don't group the rows
+                    null,                                       // don't filter by row groups
+                    null                                        // The sort order
+            );
+        return c;
+    }
+
 }

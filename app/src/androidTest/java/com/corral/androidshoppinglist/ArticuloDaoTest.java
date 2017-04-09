@@ -8,9 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import persistencia.dao.DBHelper;
+import java.util.ArrayList;
+
 import persistencia.dao.ArticuloContract;
 import persistencia.dao.ArticuloDao;
+import persistencia.dao.DBHelper;
 import persistencia.jb.Articulo;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
@@ -41,22 +43,40 @@ public class ArticuloDaoTest {
         Context appContext = getTargetContext();
 
         Articulo f = new Articulo();
-        ArticuloDao fd = new ArticuloDao();
+        ArticuloDao fd = new ArticuloDao(appContext);
 
         f.setNombre("Nombre de Articulo de prueba UPDATER");
-        assertTrue(fd.insert(appContext, f));
+        assertTrue(fd.insert(f));
 
-        f = fd.read(appContext, "Nombre de Articulo de prueba UPDATER");
+        f = fd.read("Nombre de Articulo de prueba UPDATER");
         assertTrue(f != null);
 
         f.setNombre("Nombre de Articulo de prueba UPDATE");
-        fd.update(appContext, f);
+        fd.update(f);
 
-        f = fd.read(appContext, "Nombre de Articulo de prueba UPDATE");
+        f = fd.read("Nombre de Articulo de prueba UPDATE");
         assertTrue(f != null);
 
-        assertTrue(fd.delete(appContext, f.getId()));
+        assertTrue(fd.delete(f.getId()));
 
+        f.setNombre("articuloPrueba1"); f.setDescripcion("desc1"); f.setMedida('u'); f.setId_familia(1L);
+        assertTrue(fd.insert(f));
+
+        f.setNombre("articuloPrueba2"); f.setDescripcion("desc2"); f.setMedida('k'); f.setId_familia(1L);
+        assertTrue(fd.insert(f));
+
+        f.setNombre("articuloPrueba3"); f.setDescripcion("desc3"); f.setMedida('l'); f.setId_familia(1L);
+        assertTrue(fd.insert(f));
+
+        ArrayList<Articulo> listaArticulo =  fd.listado("articulo",null,'k',0L);
+
+        for(Articulo a: listaArticulo) {
+            System.out.println("###### Articulo: " + a.getId() + "-" + a.getNombre() + "-" + a.getDescripcion() +
+            "-" + a.getMedida() + "-" + a.getId_familia());
+        }
+
+        assertTrue(listaArticulo.size() == 1);
+        assertTrue(listaArticulo.get(0).getId() == 2L);
     }
 
 }

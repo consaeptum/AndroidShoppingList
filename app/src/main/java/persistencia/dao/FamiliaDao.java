@@ -3,6 +3,7 @@ package persistencia.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class FamiliaDao {
      * @return True o False según si la operación se realizó correctamente.
      */
 
-    public Boolean insert(Familia familia) {
+    public Boolean insert(Familia familia) throws SQLiteConstraintException {
 
         // Gets the data repository in write mode
         SQLiteDatabase db = mDBHelper.getWritableDatabase();
@@ -52,7 +53,12 @@ public class FamiliaDao {
 
         // Insert the new row, returning the primary key value of the new row
         // null indica no añadir la fila si values está vacío.
-        long newRowId = db.insertOrThrow(FamiliaContract.FamiliaEntry.TABLE_NAME, null, values);
+        long newRowId = -1;
+        try {
+            newRowId = db.insertOrThrow(FamiliaContract.FamiliaEntry.TABLE_NAME, null, values);
+        } catch (Exception sqlce) {
+            if (sqlce instanceof SQLiteConstraintException) throw sqlce;
+        }
         if (newRowId > -1) familia.setId(newRowId);
 
         return newRowId > -1;
@@ -203,10 +209,12 @@ public class FamiliaDao {
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
      *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return an ArrayList of Familia
      *
      */
-    public ArrayList<Familia> listado(String nombre) {
+    public ArrayList<Familia> listado(String nombre, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -229,7 +237,7 @@ public class FamiliaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + FamiliaContract.FamiliaEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + FamiliaContract.FamiliaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                 FamiliaContract.FamiliaEntry.TABLE_NAME,  // The table to query
@@ -238,7 +246,7 @@ public class FamiliaDao {
                 selectionArgs.toArray(S),                   // The values for the WHERE clause
                 null,                                       // don't group the rows
                 null,                                       // don't filter by row groups
-                null                                        // The sort order
+                sortBy                                      // The sort order
         );
 
         ArrayList<Familia> listFamilia = new ArrayList<Familia>();
@@ -264,10 +272,12 @@ public class FamiliaDao {
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
      *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return un cursor de Familia
      *
      */
-    public Cursor getCursor(String nombre) {
+    public Cursor getCursor(String nombre, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -290,7 +300,7 @@ public class FamiliaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + FamiliaContract.FamiliaEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + FamiliaContract.FamiliaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                     FamiliaContract.FamiliaEntry.TABLE_NAME,  // The table to query
@@ -299,7 +309,8 @@ public class FamiliaDao {
                     selectionArgs.toArray(S),                   // The values for the WHERE clause
                     null,                                       // don't group the rows
                     null,                                       // don't filter by row groups
-                    null                                        // The sort order
+                    sortBy                                      // The sort order
+
             );
         return c;
     }

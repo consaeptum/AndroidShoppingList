@@ -3,6 +3,7 @@ package persistencia.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -55,7 +56,12 @@ public class ArticuloDao {
 
         // Insert the new row, returning the primary key value of the new row
         // null indica no añadir la fila si values está vacío.
-        long newRowId = db.insert(ArticuloContract.ArticuloEntry.TABLE_NAME, null, values);
+        long newRowId = -1;
+        try {
+            newRowId = db.insertOrThrow(ArticuloContract.ArticuloEntry.TABLE_NAME, null, values);
+        } catch (Exception sqlce) {
+            if (sqlce instanceof SQLiteConstraintException) throw sqlce;
+        }
         if (newRowId > -1) articulo.setId(newRowId);
 
         return newRowId > -1;
@@ -241,10 +247,12 @@ public class ArticuloDao {
      * @param medida Un carácter que especifica la media (U, L, K).  Si es null o no corresponde
      *               a U L K, no se filtrará por este campo.
      * @param id_familia El código de una familia.  Si es 0 no se filtra por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return an ArrayList of Articulo
      *
      */
-    public ArrayList<Articulo> listado(String nombre, String descrip, Character medida, Long id_familia) {
+    public ArrayList<Articulo> listado(String nombre, String descrip, Character medida, Long id_familia, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -287,7 +295,7 @@ public class ArticuloDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                 ArticuloContract.ArticuloEntry.TABLE_NAME,  // The table to query
@@ -296,7 +304,7 @@ public class ArticuloDao {
                 selectionArgs.toArray(S),                   // The values for the WHERE clause
                 null,                                       // don't group the rows
                 null,                                       // don't filter by row groups
-                null                                        // The sort order
+                sortBy                                      // The sort order
         );
 
         ArrayList<Articulo> listArticulo = new ArrayList<Articulo>();
@@ -336,10 +344,12 @@ public class ArticuloDao {
      * @param medida Un carácter que especifica la media (U, L, K).  Si es null o no corresponde
      *               a U L K, no se filtrará por este campo.
      * @param id_familia El código de una familia.  Si es 0 no se filtra por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return un cursor de Articulo
      *
      */
-    public Cursor getCursor(String nombre, String descrip, Character medida, Long id_familia) {
+    public Cursor getCursor(String nombre, String descrip, Character medida, Long id_familia, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -382,7 +392,7 @@ public class ArticuloDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                     ArticuloContract.ArticuloEntry.TABLE_NAME,  // The table to query
@@ -391,7 +401,7 @@ public class ArticuloDao {
                     selectionArgs.toArray(S),                   // The values for the WHERE clause
                     null,                                       // don't group the rows
                     null,                                       // don't filter by row groups
-                    null                                        // The sort order
+                    sortBy                                      // The sort order
             );
 
         return c;

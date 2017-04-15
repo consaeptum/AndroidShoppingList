@@ -23,6 +23,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(contract.get_SQL_CREATE_ENTRIES());
+        if (contract.hasIndex()) {
+            db.execSQL(contract.get_SQL_CREATE_INDEX());
+        }
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

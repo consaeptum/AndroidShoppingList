@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AndroidShoppingList</string>
+    <string name="title_activity_familia">ActivityFamilia</string>
 </resources>

@@ -68,7 +68,7 @@ public class ListaDaoTest {
         f.setFechaFormat("2017-04-11"); f.setId_super(3L);
         assertTrue(fd.insert(f));
 
-        ArrayList<Lista> listaLista =  fd.listado("2017-04-10", "2017-04-11", 3L);
+        ArrayList<Lista> listaLista =  fd.listado("2017-04-10", "2017-04-11", 3L, "fecha");
 
         for(Lista a: listaLista) {
             System.out.println("###### Lista: " + a.getId() + "-" + a.getFechaFormat());

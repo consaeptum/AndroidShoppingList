@@ -16,6 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ActivityFamiliaList"
+            android:label="@string/title_activity_familia"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ActivityFamiliaDetalle"></activity>
     </application>
 
 </manifest>

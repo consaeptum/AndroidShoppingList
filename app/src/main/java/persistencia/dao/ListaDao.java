@@ -3,6 +3,7 @@ package persistencia.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -53,7 +54,12 @@ public class ListaDao {
 
         // Insert the new row, returning the primary key value of the new row
         // null indica no añadir la fila si values está vacío.
-        long newRowId = db.insert(ListaContract.ListaEntry.TABLE_NAME, null, values);
+        long newRowId = -1;
+        try {
+            newRowId = db.insertOrThrow(ListaContract.ListaEntry.TABLE_NAME, null, values);
+        } catch (Exception sqlce) {
+            if (sqlce instanceof SQLiteConstraintException) throw sqlce;
+        }
         if (newRowId > -1) lista.setId(newRowId);
 
         return newRowId > -1;
@@ -165,10 +171,12 @@ public class ListaDao {
      * @param fechaFin La fecha tope de filtrado.  Si no es null, se filtrarán los resultados entre
      *               fecha y fecha_.  Debe estar en formato "AAAA-MM-dd".
      * @param id_super El código de un supermercado.  Si es 0 no se filtra por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return an ArrayList of Lista
      *
      */
-    public ArrayList<Lista> listado(String fecha, String fechaFin, Long id_super) {
+    public ArrayList<Lista> listado(String fecha, String fechaFin, Long id_super, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -208,7 +216,7 @@ public class ListaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                 ListaContract.ListaEntry.TABLE_NAME,  // The table to query
@@ -217,7 +225,7 @@ public class ListaDao {
                 selectionArgs.toArray(S),                   // The values for the WHERE clause
                 null,                                       // don't group the rows
                 null,                                       // don't filter by row groups
-                null                                        // The sort order
+                sortBy                                      // The sort order
         );
 
         ArrayList<Lista> listLista = new ArrayList<Lista>();
@@ -249,10 +257,12 @@ public class ListaDao {
      * @param fechaFin La fecha tope de filtrado.  Si no es null, se filtrarán los resultados entre
      *               fecha y fecha_.  Debe estar en formato "AAAA-MM-dd".
      * @param id_super El código de un supermercado.  Si es 0 no se filtra por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return un cursor de Lista
      *
      */
-    public Cursor getCursor(String fecha, String fechaFin, Long id_super) {
+    public Cursor getCursor(String fecha, String fechaFin, Long id_super, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -292,7 +302,7 @@ public class ListaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                     ListaContract.ListaEntry.TABLE_NAME,  // The table to query
@@ -301,7 +311,7 @@ public class ListaDao {
                     selectionArgs.toArray(S),                   // The values for the WHERE clause
                     null,                                       // don't group the rows
                     null,                                       // don't filter by row groups
-                    null                                        // The sort order
+                    sortBy                                      // The sort order
             );
 
         return c;

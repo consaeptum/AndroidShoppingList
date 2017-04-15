@@ -31,6 +31,17 @@ public final class SuperMercadoContract implements Contract {
         return SQL_DELETE_ENTRIES;
     }
 
+    @Override
+    public Boolean hasIndex() {
+        return false;
+    }
+
+    @Override
+    public String get_SQL_CREATE_INDEX() {
+        return "";
+    }
+
+
     /* Inner class that defines the table contents */
     public static class SuperMercadoEntry implements BaseColumns {
         public static final String TABLE_NAME = "supermercado";
@@ -40,10 +51,11 @@ public final class SuperMercadoContract implements Contract {
     public static final String TEXT_TYPE = " TEXT";
     public static final String UNIQUE_NOTNULL = " UNIQUE NOT NULL";
     public static final String COMMA_SEP = ",";
+    public static final String COLLATENOCASE = " COLLATE NOCASE";
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + SuperMercadoEntry.TABLE_NAME + " (" +
                     SuperMercadoEntry._ID + " INTEGER PRIMARY KEY," +
-                    SuperMercadoEntry.COLUMN_NAME_NOMBRE + TEXT_TYPE + UNIQUE_NOTNULL + " )";
+                    SuperMercadoEntry.COLUMN_NAME_NOMBRE + TEXT_TYPE + UNIQUE_NOTNULL + COLLATENOCASE + " )";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + SuperMercadoEntry.TABLE_NAME;

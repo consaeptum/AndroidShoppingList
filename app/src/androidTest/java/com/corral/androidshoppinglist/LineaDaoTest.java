@@ -68,7 +68,7 @@ public class LineaDaoTest {
         f.setPvp(1.26f); f.setCantidad(3f); f.setId_articulo(3L); f.setId_lista(5L);
         assertTrue(fd.insert(f));
 
-        ArrayList<Linea> listaLinea =  fd.listado(5L,3L);
+        ArrayList<Linea> listaLinea =  fd.listado(5L,3L, null);
 
         for(Linea a: listaLinea) {
             System.out.println("###### Linea: " + a.getId() + "-" + a.getPvp() + "-" + a.getCantidad() +

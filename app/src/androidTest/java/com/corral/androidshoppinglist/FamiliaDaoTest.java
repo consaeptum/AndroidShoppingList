@@ -68,7 +68,7 @@ public class FamiliaDaoTest {
         f.setNombre("articuloPrueba3");
         assertTrue(fd.insert(f));
 
-        ArrayList<Familia> listaFamilia =  fd.listado("articulo");
+        ArrayList<Familia> listaFamilia =  fd.listado("articulo", "nombre");
 
         for(Familia a: listaFamilia) {
             System.out.println("###### Familia: " + a.getId() + "-" + a.getNombre());

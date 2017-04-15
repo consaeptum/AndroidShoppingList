@@ -32,6 +32,16 @@ public final class ArticuloContract implements Contract {
         return SQL_DELETE_ENTRIES;
     }
 
+    @Override
+    public Boolean hasIndex() {
+        return true;
+    }
+
+    @Override
+    public String get_SQL_CREATE_INDEX() {
+        return SQL_CREATE_INDEX;
+    }
+
     /* Inner class that defines the table contents */
     public static class ArticuloEntry implements BaseColumns {
         public static final String TABLE_NAME = "articulo";
@@ -45,17 +55,21 @@ public final class ArticuloContract implements Contract {
     public static final String INTEGER_TYPE = " INTEGER";
     public static final String UNIQUE_NOTNULL = " UNIQUE NOT NULL";
     public static final String COMMA_SEP = ",";
+    public static final String COLLATENOCASE = " COLLATE NOCASE";
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + ArticuloEntry.TABLE_NAME + " (" +
                     ArticuloEntry._ID + " INTEGER PRIMARY KEY," +
                     ArticuloEntry.COLUMN_NAME_ID_FAMILIA + INTEGER_TYPE + COMMA_SEP +
-                    ArticuloEntry.COLUMN_NAME_NOMBRE + TEXT_TYPE + UNIQUE_NOTNULL + COMMA_SEP +
-                    ArticuloEntry.COLUMN_NAME_DESCRIPCION + TEXT_TYPE + COMMA_SEP +
+                    ArticuloEntry.COLUMN_NAME_NOMBRE + TEXT_TYPE + UNIQUE_NOTNULL + COLLATENOCASE + COMMA_SEP +
+                    ArticuloEntry.COLUMN_NAME_DESCRIPCION + TEXT_TYPE + COLLATENOCASE + COMMA_SEP +
                     ArticuloEntry.COLUMN_NAME_MEDIDA + TEXT_TYPE + COMMA_SEP +
                         " FOREIGN KEY ("+ ArticuloEntry.COLUMN_NAME_ID_FAMILIA+") REFERENCES "+
                             FamiliaContract.FamiliaEntry.TABLE_NAME+
                             "("+FamiliaContract.FamiliaEntry._ID+")" +
                     " )";
+
+    public static final String SQL_CREATE_INDEX =
+            "CREATE UNIQUE INDEX idx_articulo_nombre ON articulo(nombre);";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + ArticuloEntry.TABLE_NAME;

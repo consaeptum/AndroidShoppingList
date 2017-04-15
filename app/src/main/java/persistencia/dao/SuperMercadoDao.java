@@ -3,6 +3,7 @@ package persistencia.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -53,7 +54,12 @@ public class SuperMercadoDao {
 
         // Insert the new row, returning the primary key value of the new row
         // null indica no añadir la fila si values está vacío.
-        long newRowId = db.insert(SuperMercadoContract.SuperMercadoEntry.TABLE_NAME, null, values);
+        long newRowId = -1;
+        try {
+            newRowId = db.insertOrThrow(SuperMercadoContract.SuperMercadoEntry.TABLE_NAME, null, values);
+        } catch (Exception sqlce) {
+            if (sqlce instanceof SQLiteConstraintException) throw sqlce;
+        }
         if (newRowId > -1) superMercado.setId(newRowId);
 
         return newRowId > -1;
@@ -207,10 +213,12 @@ public class SuperMercadoDao {
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
      *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return an ArrayList of SuperMercado
      *
      */
-    public ArrayList<SuperMercado> listado(String nombre) {
+    public ArrayList<SuperMercado> listado(String nombre, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -233,7 +241,7 @@ public class SuperMercadoDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + SuperMercadoContract.SuperMercadoEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + SuperMercadoContract.SuperMercadoEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                 SuperMercadoContract.SuperMercadoEntry.TABLE_NAME,  // The table to query
@@ -242,7 +250,7 @@ public class SuperMercadoDao {
                 selectionArgs.toArray(S),                   // The values for the WHERE clause
                 null,                                       // don't group the rows
                 null,                                       // don't filter by row groups
-                null                                        // The sort order
+                sortBy                                      // The sort order
         );
 
         ArrayList<SuperMercado> listSuperMercado = new ArrayList<SuperMercado>();
@@ -268,10 +276,12 @@ public class SuperMercadoDao {
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
      *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return un cursor de Supermercado
      *
      */
-    public Cursor getCursor(String nombre) {
+    public Cursor getCursor(String nombre, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -294,7 +304,7 @@ public class SuperMercadoDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + SuperMercadoContract.SuperMercadoEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + SuperMercadoContract.SuperMercadoEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                     SuperMercadoContract.SuperMercadoEntry.TABLE_NAME,  // The table to query
@@ -303,7 +313,7 @@ public class SuperMercadoDao {
                     selectionArgs.toArray(S),                   // The values for the WHERE clause
                     null,                                       // don't group the rows
                     null,                                       // don't filter by row groups
-                    null                                        // The sort order
+                    sortBy                                      // The sort order
             );
 
         return c;

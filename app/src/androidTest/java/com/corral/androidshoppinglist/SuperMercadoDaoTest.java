@@ -68,7 +68,7 @@ public class SuperMercadoDaoTest {
         f.setNombre("superPrueba3");
         assertTrue(fd.insert(f));
 
-        ArrayList<SuperMercado> listaSuperMercado =  fd.listado("super");
+        ArrayList<SuperMercado> listaSuperMercado =  fd.listado("super", "nombre");
 
         for(SuperMercado a: listaSuperMercado) {
             System.out.println("###### SuperMercado: " + a.getId() + "-" + a.getNombre());

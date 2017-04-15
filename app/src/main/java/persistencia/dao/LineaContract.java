@@ -32,6 +32,17 @@ public final class LineaContract implements Contract {
         return SQL_DELETE_ENTRIES;
     }
 
+    @Override
+    public Boolean hasIndex() {
+        return true;
+    }
+
+    @Override
+    public String get_SQL_CREATE_INDEX() {
+        return SQL_CREATE_INDEX;
+    }
+
+
     /* Inner class that defines the table contents */
     public static class LineaEntry implements BaseColumns {
         public static final String TABLE_NAME = "linea";
@@ -59,6 +70,9 @@ public final class LineaContract implements Contract {
                             ArticuloContract.ArticuloEntry.TABLE_NAME+
                             "("+ArticuloContract.ArticuloEntry._ID+")" +
                     " )";
+
+    public static final String SQL_CREATE_INDEX =
+            "CREATE UNIQUE INDEX idx_linea_lista_articulo ON linea(id_lista, id_articulo);";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + LineaEntry.TABLE_NAME;

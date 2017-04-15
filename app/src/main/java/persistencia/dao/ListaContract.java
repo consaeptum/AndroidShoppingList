@@ -32,6 +32,17 @@ public final class ListaContract implements Contract {
         return SQL_DELETE_ENTRIES;
     }
 
+    @Override
+    public Boolean hasIndex() {
+        return true;
+    }
+
+    @Override
+    public String get_SQL_CREATE_INDEX() {
+        return SQL_CREATE_INDEX;
+    }
+
+
     /* Inner class that defines the table contents */
     public static class ListaEntry implements BaseColumns {
         public static final String TABLE_NAME = "Lista";
@@ -52,6 +63,9 @@ public final class ListaContract implements Contract {
                             SuperMercadoContract.SuperMercadoEntry.TABLE_NAME+
                             "("+SuperMercadoContract.SuperMercadoEntry._ID+")" +
                     " )";
+
+    public static final String SQL_CREATE_INDEX =
+            "CREATE UNIQUE INDEX idx_lista_fecha ON lista(fecha);";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + ListaEntry.TABLE_NAME;

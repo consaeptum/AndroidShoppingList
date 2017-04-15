@@ -11,11 +11,11 @@ import android.view.animation.Animation;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import persistencia.dao.FamiliaContract;
+import persistencia.dao.ArticuloContract;
 
-public class CursorAdapterFamilia extends CursorAdapter {
+public class CursorAdapterArticulo extends CursorAdapter {
 
-    public CursorAdapterFamilia(Context context, Cursor cursor) {
+    public CursorAdapterArticulo(Context context, Cursor cursor) {
         super(context, cursor, 0);
     }
 
@@ -45,7 +45,7 @@ public class CursorAdapterFamilia extends CursorAdapter {
     // you don't bind any data to the view at this point.
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.cursor_item_familia, parent, false);
+        return LayoutInflater.from(context).inflate(R.layout.cursor_item_articulo, parent, false);
     }
 
     // The bindView method is used to bind all data to a given view
@@ -53,11 +53,33 @@ public class CursorAdapterFamilia extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Find fields to populate in inflated template
-        TextView tvFamilia = (TextView) view.findViewById(R.id.familia);
+        TextView tvArticulo = (TextView) view.findViewById(R.id.articulo);
+        // Extract properties from cursor
+        String articulo = cursor.getString(cursor.getColumnIndexOrThrow(
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
+        // Populate fields with extracted properties
+        tvArticulo.setText(articulo);
+
+        TextView tvDescripcion = (TextView) view.findViewById(R.id.descripcion);
+        // Extract properties from cursor
+        String descripcion = cursor.getString(cursor.getColumnIndexOrThrow(
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION));
+        // Populate fields with extracted properties
+        tvArticulo.setText(descripcion);
+
+        TextView tvMedida = (TextView) view.findViewById(R.id.medida);
+        // Extract properties from cursor
+        String medida = cursor.getString(cursor.getColumnIndexOrThrow(
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA));
+        // Populate fields with extracted properties
+        tvArticulo.setText(medida);
+
+        TextView tvFamili = (TextView) view.findViewById(R.id.familia);
         // Extract properties from cursor
         String familia = cursor.getString(cursor.getColumnIndexOrThrow(
-                FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA));
         // Populate fields with extracted properties
-        tvFamilia.setText(familia);
+        tvArticulo.setText(familia);
+
     }
 }

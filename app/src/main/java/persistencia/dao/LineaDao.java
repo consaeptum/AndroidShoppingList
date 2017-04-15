@@ -3,6 +3,7 @@ package persistencia.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -55,7 +56,12 @@ public class LineaDao {
 
         // Insert the new row, returning the primary key value of the new row
         // null indica no añadir la fila si values está vacío.
-        long newRowId = db.insert(LineaContract.LineaEntry.TABLE_NAME, null, values);
+        long newRowId = -1;
+        try {
+            newRowId = db.insertOrThrow(LineaContract.LineaEntry.TABLE_NAME, null, values);
+        } catch (Exception sqlce) {
+            if (sqlce instanceof SQLiteConstraintException) throw sqlce;
+        }
         if (newRowId > -1) linea.setId(newRowId);
 
         return newRowId > -1;
@@ -174,10 +180,12 @@ public class LineaDao {
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param id_lista El código de una lista.  Si es 0 no se filtra por este campo.
      * @param id_articulo El código de un artículo.  Si es 0 no se filtra por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return an ArrayList of Linea
      *
      */
-    public ArrayList<Linea> listado(Long id_lista, Long id_articulo) {
+    public ArrayList<Linea> listado(Long id_lista, Long id_articulo, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -208,7 +216,7 @@ public class LineaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + LineaContract.LineaEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + LineaContract.LineaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                 LineaContract.LineaEntry.TABLE_NAME,  // The table to query
@@ -217,7 +225,7 @@ public class LineaDao {
                 selectionArgs.toArray(S),                   // The values for the WHERE clause
                 null,                                       // don't group the rows
                 null,                                       // don't filter by row groups
-                null                                        // The sort order
+                sortBy                                      // The sort order
         );
 
         ArrayList<Linea> listLinea = new ArrayList<Linea>();
@@ -252,10 +260,12 @@ public class LineaDao {
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param id_lista El código de una lista.  Si es 0 no se filtra por este campo.
      * @param id_articulo El código de un artículo.  Si es 0 no se filtra por este campo.
+     * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
+     *               ordenado en caso contrario.
      * @return un cursor de  Linea
      *
      */
-    public Cursor getCursor(Long id_lista, Long id_articulo) {
+    public Cursor getCursor(Long id_lista, Long id_articulo, String sortBy) {
 
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
@@ -286,7 +296,7 @@ public class LineaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + LineaContract.LineaEntry.TABLE_NAME, null);
+            c = db.rawQuery("SELECT * FROM " + LineaContract.LineaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                     LineaContract.LineaEntry.TABLE_NAME,  // The table to query
@@ -295,7 +305,7 @@ public class LineaDao {
                     selectionArgs.toArray(S),                   // The values for the WHERE clause
                     null,                                       // don't group the rows
                     null,                                       // don't filter by row groups
-                    null                                        // The sort order
+                    sortBy                                      // The sort order
             );
 
         return c;

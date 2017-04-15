@@ -68,7 +68,7 @@ public class ArticuloDaoTest {
         f.setNombre("articuloPrueba3"); f.setDescripcion("desc3"); f.setMedida('l'); f.setId_familia(1L);
         assertTrue(fd.insert(f));
 
-        ArrayList<Articulo> listaArticulo =  fd.listado("articulo",null,'k',0L);
+        ArrayList<Articulo> listaArticulo =  fd.listado("articulo",null,'k',0L, "nombre");
 
         for(Articulo a: listaArticulo) {
             System.out.println("###### Articulo: " + a.getId() + "-" + a.getNombre() + "-" + a.getDescripcion() +

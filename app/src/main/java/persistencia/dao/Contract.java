@@ -8,5 +8,7 @@ public interface Contract {
 
     String get_SQL_CREATE_ENTRIES();
     String get_SQL_DELETE_ENTRIES();
+    Boolean hasIndex();
+    String get_SQL_CREATE_INDEX();
 
 }

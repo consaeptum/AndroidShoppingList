@@ -9,18 +9,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".ActivityFamiliaList"
             android:label="@string/title_activity_familia"
+            android:exported="true"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ActivityFamiliaDetalle"></activity>
+        <activity android:name=".ActivityFamiliaDetalle" />
+
+        <activity
+            android:name=".ActivitySuperMercadoList"
+            android:label="@string/title_activity_familia"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ActivitySuperMercadoDetalle" />
+
+        <activity
+            android:name=".ActivityArticuloList"
+            android:label="@string/title_activity_familia"
+            android:exported="true"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
+        </activity>
+        <activity android:name=".ActivityArticuloDetalle" />
+
     </application>
 
 </manifest>

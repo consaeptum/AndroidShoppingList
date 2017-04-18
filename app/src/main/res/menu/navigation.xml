@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_supermercado"
+        android:icon="@drawable/ic_store_black_24dp"
+        android:title="Supers"/>
+
+    <item
+        android:id="@+id/navigation_familia"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="Familia" />
+
+    <item
+        android:id="@+id/navigation_articulo"
+        android:icon="@drawable/ic_label_outline_black_24dp"
+        android:title="Artículo" />
+
+    <item
+        android:id="@+id/navigation_lista"
+        android:icon="@drawable/ic_shopping_cart_black_24dp"
+        android:title="Mi lista" />
+
+</menu>

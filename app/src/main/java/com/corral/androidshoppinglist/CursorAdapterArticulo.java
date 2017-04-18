@@ -27,6 +27,17 @@ public class CursorAdapterArticulo extends CursorAdapter {
         int colorPos = position % colors.length;
         view.setBackgroundColor(colors[colorPos]);
 
+        TextView tv_list_item_articulo = (TextView) view.findViewById(R.id.list_item_articulo);
+        TextView tv_list_item_descripcion = (TextView) view.findViewById(R.id.list_item_descripcion);
+        TextView tv_list_item_familia = (TextView) view.findViewById(R.id.list_item_familia);
+
+        tv_list_item_articulo.setText(getCursor().getString(
+                getCursor().getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE)));
+        tv_list_item_descripcion.setText(getCursor().getString(
+                getCursor().getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION)));
+        tv_list_item_familia.setText(getCursor().getString(
+                getCursor().getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA)));
+
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -53,28 +64,21 @@ public class CursorAdapterArticulo extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Find fields to populate in inflated template
-        TextView tvArticulo = (TextView) view.findViewById(R.id.articulo);
+        TextView tvArticulo = (TextView) view.findViewById(R.id.list_item_articulo);
         // Extract properties from cursor
         String articulo = cursor.getString(cursor.getColumnIndexOrThrow(
                 ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
         // Populate fields with extracted properties
         tvArticulo.setText(articulo);
 
-        TextView tvDescripcion = (TextView) view.findViewById(R.id.descripcion);
+        TextView tvDescripcion = (TextView) view.findViewById(R.id.list_item_descripcion);
         // Extract properties from cursor
         String descripcion = cursor.getString(cursor.getColumnIndexOrThrow(
                 ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION));
         // Populate fields with extracted properties
         tvArticulo.setText(descripcion);
 
-        TextView tvMedida = (TextView) view.findViewById(R.id.medida);
-        // Extract properties from cursor
-        String medida = cursor.getString(cursor.getColumnIndexOrThrow(
-                ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA));
-        // Populate fields with extracted properties
-        tvArticulo.setText(medida);
-
-        TextView tvFamili = (TextView) view.findViewById(R.id.familia);
+        TextView tvFamili = (TextView) view.findViewById(R.id.list_item_familia);
         // Extract properties from cursor
         String familia = cursor.getString(cursor.getColumnIndexOrThrow(
                 ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA));

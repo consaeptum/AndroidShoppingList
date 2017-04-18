@@ -16,14 +16,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import persistencia.dao.FamiliaDao;
-import persistencia.jb.Familia;
+import persistencia.dao.SuperMercadoDao;
+import persistencia.jb.SuperMercado;
 import util.BottomNavigationViewHelper;
 
-public class ActivityFamiliaDetalle extends AppCompatActivity {
+public class ActivitySuperMercadoDetalle extends AppCompatActivity {
 
     Context contexto;
-    Familia familia;
+    SuperMercado supermercado;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -62,20 +62,20 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_familia_detalle);
+        setContentView(R.layout.activity_supermercado_detalle);
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         contexto = this;
-        familia = (Familia) getIntent().getSerializableExtra("Familia");
+        supermercado = (SuperMercado) getIntent().getSerializableExtra("SuperMercado");
 
-        // si familia null indica que no se va a modificar o eliminar porque no se envía una referencia.
-        definirBotones(familia == null);
+        // si supermercado null indica que no se va a modificar o eliminar porque no se envía una referencia.
+        definirBotones(supermercado == null);
 
-        if (familia != null) {
-            rellenaCampos(familia);
+        if (supermercado != null) {
+            rellenaCampos(supermercado);
         }
     }
 
@@ -102,14 +102,14 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
                 builder
-                        .setTitle("Eliminar Familia")
+                        .setTitle("Eliminar SuperMercado")
                         .setMessage("Confirme la operación, por favor.")
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                if (familia != null) {
-                                    FamiliaDao fd = new FamiliaDao(contexto);
-                                    fd.delete(familia.getId());
+                                if (supermercado != null) {
+                                    SuperMercadoDao fd = new SuperMercadoDao(contexto);
+                                    fd.delete(supermercado.getId());
                                     fd.close();
                                 }
                                 finish();
@@ -132,16 +132,16 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonGuardar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FamiliaDao fd = new FamiliaDao(contexto);
-                // si familia == null venimos de añadir un registro nuevo.
-                if (familia == null) {
+                SuperMercadoDao fd = new SuperMercadoDao(contexto);
+                // si supermercado == null venimos de añadir un registro nuevo.
+                if (supermercado == null) {
                     try {
-                        familia = obtenCampos();
-                        fd.insert(familia);
+                        supermercado = obtenCampos();
+                        fd.insert(supermercado);
                     } catch (SQLiteException sqlce) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
                         builder
-                                .setTitle("Añádir familia")
+                                .setTitle("Añadir supermercado_")
                                 .setMessage("Algún campo está vacío o se intenta guardar un nombre repetido.")
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .setPositiveButton("Ok", null)
@@ -153,12 +153,12 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
                 // en caso contrario venimos de modificar y queremos guardar los cambios.
                 } else {
                     try {
-                        familia = obtenCampos();
-                        fd.update(familia);
+                        supermercado = obtenCampos();
+                        fd.update(supermercado);
                     } catch (SQLiteException sqlce) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
                         builder
-                                .setTitle("Modificar familia")
+                                .setTitle("Modificar supermercado_")
                                 .setMessage("Algún campo está vacío o se intenta guardar un nombre repetido.")
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .setPositiveButton("Ok", null)
@@ -172,14 +172,14 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         });
     }
 
-    // Devuelve Familia leyéndolo de los EditText.
+    // Devuelve SuperMercado leyéndolo de los EditText.
     // Lanza SQLiteConstraintException si algún campo UNIQUE, está vacío.
-    private Familia obtenCampos() throws SQLiteConstraintException {
+    private SuperMercado obtenCampos() throws SQLiteConstraintException {
 
-        EditText et_codigo = (EditText) findViewById(R.id.et_familia_codigo);
-        EditText et_nombre = (EditText) findViewById(R.id.et_familia_nombre);
+        EditText et_codigo = (EditText) findViewById(R.id.et_supermercado_codigo);
+        EditText et_nombre = (EditText) findViewById(R.id.et_supermercado_nombre);
 
-        Familia f = new Familia();
+        SuperMercado f = new SuperMercado();
         if (et_nombre.getText().toString().length() == 0) throw new SQLiteConstraintException();
 
         try {
@@ -191,10 +191,10 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         return f;
     }
 
-    // Rellena los EditText leyéndolo del parámetro Familia
-    private void rellenaCampos(Familia f) {
-        EditText et_codigo = (EditText) findViewById(R.id.et_familia_codigo);
-        EditText et_nombre = (EditText) findViewById(R.id.et_familia_nombre);
+    // Rellena los EditText leyéndolo del parámetro SuperMercado
+    private void rellenaCampos(SuperMercado f) {
+        EditText et_codigo = (EditText) findViewById(R.id.et_supermercado_codigo);
+        EditText et_nombre = (EditText) findViewById(R.id.et_supermercado_nombre);
         et_codigo.setText(f.getId().toString(), TextView.BufferType.EDITABLE);
         et_nombre.setText(f.getNombre(), TextView.BufferType.EDITABLE);
     }
@@ -204,8 +204,8 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonEliminar)).setVisibility(View.GONE);
         ((Button) findViewById(R.id.buttonModificar)).setVisibility(View.GONE);
         ((Button) findViewById(R.id.buttonGuardar)).setVisibility(View.VISIBLE);
-        ((EditText) findViewById(R.id.et_familia_codigo)).setEnabled(false);
-        ((EditText) findViewById(R.id.et_familia_nombre)).setEnabled(true);
+        ((EditText) findViewById(R.id.et_supermercado_codigo)).setEnabled(false);
+        ((EditText) findViewById(R.id.et_supermercado_nombre)).setEnabled(true);
     }
 
     // Cambiar apariencia de botones para mostrar Botones Modificar y Eliminar.

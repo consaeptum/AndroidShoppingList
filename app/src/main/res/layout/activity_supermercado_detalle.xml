@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:focusableInTouchMode="true"
-    tools:context="com.corral.androidshoppinglist.ActivityFamiliaDetalle">
+    tools:context="com.corral.androidshoppinglist.ActivitySuperMercadoDetalle">
 
     <LinearLayout
         android:id="@+id/LineraLayoutH"
@@ -71,7 +71,7 @@
 
 
         <TextView
-            android:id="@+id/tv_familia_detalle_codigo"
+            android:id="@+id/tv_supermercado_detalle_codigo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -82,7 +82,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/et_familia_codigo"
+            android:id="@+id/et_supermercado_codigo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -94,17 +94,17 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tv_familia_detalle_nombre"
+            android:id="@+id/tv_supermercado_detalle_nombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="familia"
+            android:text="supermercado"
             android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
             android:textColor="@android:color/darker_gray"
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/et_familia_nombre"
+            android:id="@+id/et_supermercado_nombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -122,8 +122,6 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -139,7 +137,7 @@
             app:itemBackground="@color/colorPrimary"
             app:itemIconTint="@drawable/selector_bottom_nav"
             app:itemTextColor="@drawable/selector_bottom_nav"
-            app:menu="@menu/navigation" />
+            app:menu="@menu/navigation"/>
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

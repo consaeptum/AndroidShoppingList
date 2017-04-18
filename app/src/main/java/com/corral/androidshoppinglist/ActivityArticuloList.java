@@ -15,12 +15,13 @@ import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 
-import persistencia.dao.FamiliaContract;
-import persistencia.dao.FamiliaDao;
-import persistencia.jb.Familia;
+import persistencia.dao.ArticuloContract;
+import persistencia.dao.ArticuloDao;
+import persistencia.jb.Articulo;
 import util.BottomNavigationViewHelper;
 
-public class ActivityFamiliaList extends AppCompatActivity {
+
+public class ActivityArticuloList extends AppCompatActivity {
 
     ListView lv;
 
@@ -58,10 +59,11 @@ public class ActivityFamiliaList extends AppCompatActivity {
 
     };
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_familia_list);
+        setContentView(R.layout.activity_articulo_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -69,11 +71,11 @@ public class ActivityFamiliaList extends AppCompatActivity {
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        CursorAdapterFamilia caf = new CursorAdapterFamilia(this, new FamiliaDao(this).
-                getCursor(null, FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));
+        CursorAdapterArticulo caf = new CursorAdapterArticulo(this, new ArticuloDao(this).
+                getCursor(null, null, null, null, ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
 
 
-        lv = ((ListView)findViewById(R.id.listaFamilia));
+        lv = ((ListView)findViewById(R.id.listaArticulo));
         lv.setAdapter(caf);
 
         // Al hacer click en un elemento de la lista
@@ -83,14 +85,20 @@ public class ActivityFamiliaList extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Familia f = new Familia();
+                Articulo f = new Articulo();
                 Cursor cur = (Cursor) lv.getAdapter().getItem(position);
                 cur.moveToPosition(position);
-                f.setId(cur.getLong(cur.getColumnIndex(FamiliaContract.FamiliaEntry._ID)));
-                f.setNombre(cur.getString(cur.getColumnIndex(FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE)));
+                f.setId(cur.getLong(cur.getColumnIndex(
+                        ArticuloContract.ArticuloEntry._ID)));
+                f.setNombre(cur.getString(cur.getColumnIndex(
+                        ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE)));
+                f.setDescripcion(cur.getString(cur.getColumnIndex(
+                        ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION)));
+                f.setId_familia(Long.parseLong(cur.getString(cur.getColumnIndex(
+                        ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA))));
 
-                Intent intent = new Intent(contexto,ActivityFamiliaDetalle.class);
-                intent.putExtra("Familia", f);
+                Intent intent = new Intent(contexto,ActivityArticuloDetalle.class);
+                intent.putExtra("Articulo", f);
                 startActivity(intent);
             }
         });
@@ -100,9 +108,10 @@ public class ActivityFamiliaList extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ((CursorAdapter)lv.getAdapter()).changeCursor(new FamiliaDao(this).
-                getCursor(null, FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));
+        ((CursorAdapter)lv.getAdapter()).changeCursor(new ArticuloDao(this).
+                getCursor(null, null, null, null, ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -118,10 +127,11 @@ public class ActivityFamiliaList extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_add) {
-            Intent intent = new Intent(this,ActivityFamiliaDetalle.class);
+            Intent intent = new Intent(this,ActivityArticuloDetalle.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
-
 }
+
+

@@ -53,7 +53,7 @@ public final class SuperMercadoContract implements Contract {
     public static final String COMMA_SEP = ",";
     public static final String COLLATENOCASE = " COLLATE NOCASE";
     public static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + SuperMercadoEntry.TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + SuperMercadoEntry.TABLE_NAME + " (" +
                     SuperMercadoEntry._ID + " INTEGER PRIMARY KEY," +
                     SuperMercadoEntry.COLUMN_NAME_NOMBRE + TEXT_TYPE + UNIQUE_NOTNULL + COLLATENOCASE + " )";
 

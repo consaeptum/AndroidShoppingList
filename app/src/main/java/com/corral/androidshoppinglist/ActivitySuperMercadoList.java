@@ -15,12 +15,12 @@ import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 
-import persistencia.dao.FamiliaContract;
-import persistencia.dao.FamiliaDao;
-import persistencia.jb.Familia;
+import persistencia.dao.SuperMercadoContract;
+import persistencia.dao.SuperMercadoDao;
+import persistencia.jb.SuperMercado;
 import util.BottomNavigationViewHelper;
 
-public class ActivityFamiliaList extends AppCompatActivity {
+public class ActivitySuperMercadoList extends AppCompatActivity {
 
     ListView lv;
 
@@ -61,7 +61,7 @@ public class ActivityFamiliaList extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_familia_list);
+        setContentView(R.layout.activity_supermercado_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -69,11 +69,11 @@ public class ActivityFamiliaList extends AppCompatActivity {
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        CursorAdapterFamilia caf = new CursorAdapterFamilia(this, new FamiliaDao(this).
-                getCursor(null, FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));
+        CursorAdapterSuperMercado caf = new CursorAdapterSuperMercado(this, new SuperMercadoDao(this).
+                getCursor(null, SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE));
 
 
-        lv = ((ListView)findViewById(R.id.listaFamilia));
+        lv = ((ListView)findViewById(R.id.listaSuperMercado));
         lv.setAdapter(caf);
 
         // Al hacer click en un elemento de la lista
@@ -83,14 +83,14 @@ public class ActivityFamiliaList extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Familia f = new Familia();
+                SuperMercado f = new SuperMercado();
                 Cursor cur = (Cursor) lv.getAdapter().getItem(position);
                 cur.moveToPosition(position);
-                f.setId(cur.getLong(cur.getColumnIndex(FamiliaContract.FamiliaEntry._ID)));
-                f.setNombre(cur.getString(cur.getColumnIndex(FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE)));
+                f.setId(cur.getLong(cur.getColumnIndex(SuperMercadoContract.SuperMercadoEntry._ID)));
+                f.setNombre(cur.getString(cur.getColumnIndex(SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE)));
 
-                Intent intent = new Intent(contexto,ActivityFamiliaDetalle.class);
-                intent.putExtra("Familia", f);
+                Intent intent = new Intent(contexto,ActivitySuperMercadoDetalle.class);
+                intent.putExtra("SuperMercado", f);
                 startActivity(intent);
             }
         });
@@ -100,10 +100,9 @@ public class ActivityFamiliaList extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ((CursorAdapter)lv.getAdapter()).changeCursor(new FamiliaDao(this).
-                getCursor(null, FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));
+        ((CursorAdapter)lv.getAdapter()).changeCursor(new SuperMercadoDao(this).
+                getCursor(null, SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE));
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -118,7 +117,7 @@ public class ActivityFamiliaList extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_add) {
-            Intent intent = new Intent(this,ActivityFamiliaDetalle.class);
+            Intent intent = new Intent(this,ActivityArticuloDetalle.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

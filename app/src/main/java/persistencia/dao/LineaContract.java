@@ -57,7 +57,7 @@ public final class LineaContract implements Contract {
     public static final String UNIQUE_NOTNULL = " UNIQUE NOT NULL";
     public static final String COMMA_SEP = ",";
     public static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + LineaEntry.TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + LineaEntry.TABLE_NAME + " (" +
                     LineaEntry._ID + " INTEGER PRIMARY KEY," +
                     LineaEntry.COLUMN_NAME_ID_ARTICULO + INTEGER_TYPE + COMMA_SEP +
                     LineaEntry.COLUMN_NAME_ID_LISTA + INTEGER_TYPE + COMMA_SEP +

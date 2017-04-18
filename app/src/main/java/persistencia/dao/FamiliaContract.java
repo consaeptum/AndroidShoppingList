@@ -54,7 +54,7 @@ public final class FamiliaContract implements Contract {
     public static final String COMMA_SEP = ",";
     public static final String COLLATENOCASE = " COLLATE NOCASE";
     public static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + FamiliaEntry.TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + FamiliaEntry.TABLE_NAME + " (" +
                     FamiliaEntry._ID + " INTEGER PRIMARY KEY," +
                     FamiliaEntry.COLUMN_NAME_NOMBRE + TEXT_TYPE + UNIQUE_NOTNULL + COLLATENOCASE + ")";
 

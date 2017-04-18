@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    tools:context="com.corral.androidshoppinglist.ActivityArticuloDetalle">
+
+    <LinearLayout
+        android:id="@+id/LineraLayoutH"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:elevation="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:id="@+id/LinearLayoutV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/buttonVolver"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="#bac2f8"
+                android:text="Volver" />
+
+            <Button
+                android:id="@+id/buttonModificar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="#b1c1c9"
+                android:text="Modificar"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/buttonEliminar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="1"
+                android:background="#b1c1c9"
+                android:text="Eliminar"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/buttonGuardar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:layout_weight="3"
+                android:background="#b1c1c9"
+                android:text="Guardar"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="?attr/actionBarSize">
+
+        <LinearLayout
+            android:id="@+id/LinearLayoutTextViews"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_articulo_detalle_codigo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:text="código"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_articulo_codigo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:focusable="false"
+                android:inputType="number"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="#383838"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_articulo_detalle_nombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Nombre artículo"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_articulo_nombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:inputType="text|textCapSentences"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="#383838"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_articulo_detalle_descripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Descripción"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_articulo_descripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:inputType="text|textCapSentences"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="#383838"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_articulo_detalle_medida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Unidad de medida"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_articulo_medida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:inputType="numberDecimal|numberSigned"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="#383838"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_articulo_detalle_familia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/fab_margin"
+                android:text="familia"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="@android:color/darker_gray"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/et_articulo_familia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:enabled="false"
+                android:inputType="number"
+                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                android:textColor="#383838"
+                android:textStyle="bold" />
+        </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LinearLayoutNavView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/navigation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:itemBackground="@color/colorPrimary"
+            app:itemIconTint="@drawable/selector_bottom_nav"
+            app:itemTextColor="@drawable/selector_bottom_nav"
+            app:menu="@menu/navigation" />
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>

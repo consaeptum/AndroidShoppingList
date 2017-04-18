@@ -205,7 +205,7 @@ public class FamiliaDao {
     }
 
     /**
-     * Obtiene una lista de familias filtrado por los campos de los parametros.
+     * Obtiene una lista de familias_ filtrado por los campos de los parametros.
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
      *               condición de filtrado.  Si es null, no se filtrará por este campo.
@@ -268,7 +268,7 @@ public class FamiliaDao {
     }
 
     /**
-     * Obtiene el cursor de una lista de familias filtrado por los campos de los parametros.
+     * Obtiene el cursor de una lista de familias_ filtrado por los campos de los parametros.
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
      * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
      *               condición de filtrado.  Si es null, no se filtrará por este campo.

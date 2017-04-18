@@ -57,7 +57,7 @@ public final class ArticuloContract implements Contract {
     public static final String COMMA_SEP = ",";
     public static final String COLLATENOCASE = " COLLATE NOCASE";
     public static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + ArticuloEntry.TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + ArticuloEntry.TABLE_NAME + " (" +
                     ArticuloEntry._ID + " INTEGER PRIMARY KEY," +
                     ArticuloEntry.COLUMN_NAME_ID_FAMILIA + INTEGER_TYPE + COMMA_SEP +
                     ArticuloEntry.COLUMN_NAME_NOMBRE + TEXT_TYPE + UNIQUE_NOTNULL + COLLATENOCASE + COMMA_SEP +

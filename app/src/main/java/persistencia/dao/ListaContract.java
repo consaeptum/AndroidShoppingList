@@ -55,7 +55,7 @@ public final class ListaContract implements Contract {
     public static final String INTEGER_TYPE = " INTEGER";
     public static final String COMMA_SEP = ",";
     public static final String SQL_CREATE_ENTRIES =
-            "CREATE TABLE " + ListaEntry.TABLE_NAME + " (" +
+            "CREATE TABLE IF NOT EXISTS " + ListaEntry.TABLE_NAME + " (" +
                     ListaEntry._ID + " INTEGER PRIMARY KEY," +
                     ListaEntry.COLUMN_NAME_ID_SUPER + INTEGER_TYPE + COMMA_SEP +
                     ListaEntry.COLUMN_NAME_FECHA + INTEGER_TYPE + NOTNULL + COMMA_SEP +

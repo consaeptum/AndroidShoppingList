@@ -246,7 +246,7 @@ public class ArticuloDao {
      *                en cualquier parte del texto. Si es null, no se filtrará por este campo.
      * @param medida Un carácter que especifica la media (U, L, K).  Si es null o no corresponde
      *               a U L K, no se filtrará por este campo.
-     * @param id_familia El código de una familia.  Si es 0 no se filtra por este campo.
+     * @param id_familia El código de una familia.  Si es null no se filtra por este campo.
      * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
      *               ordenado en caso contrario.
      * @return an ArrayList of Articulo
@@ -286,7 +286,7 @@ public class ArticuloDao {
                 selectionArgs.add(medida.toString().toUpperCase());
             }
         }
-        if (id_familia > 0) {
+        if (id_familia != null) {
             if (selection.length() > 0) selection = selection.concat(" AND ");
             selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA + " =?");
             selectionArgs.add(id_familia.toString());
@@ -343,7 +343,7 @@ public class ArticuloDao {
      *                en cualquier parte del texto. Si es null, no se filtrará por este campo.
      * @param medida Un carácter que especifica la media (U, L, K).  Si es null o no corresponde
      *               a U L K, no se filtrará por este campo.
-     * @param id_familia El código de una familia.  Si es 0 no se filtra por este campo.
+     * @param id_familia El código de una familia.  Si es null no se filtra por este campo.
      * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
      *               ordenado en caso contrario.
      * @return un cursor de Articulo
@@ -383,7 +383,7 @@ public class ArticuloDao {
                 selectionArgs.add(medida.toString().toUpperCase());
             }
         }
-        if (id_familia > 0) {
+        if (id_familia != null) {
             if (selection.length() > 0) selection = selection.concat(" AND ");
             selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA + " =?");
             selectionArgs.add(id_familia.toString());

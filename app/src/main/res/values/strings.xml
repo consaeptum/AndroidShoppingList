@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">AndroidShoppingList</string>
     <string name="title_activity_familia">ActivityFamilia</string>
+    <string name="title_activity_principal">PrincipalActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>

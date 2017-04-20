@@ -70,6 +70,8 @@ public class ActivityArticuloList extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().setGroupCheckable(0, true, true);
+        navigation.getMenu().getItem(2).setChecked(true);
 
         CursorAdapterArticulo caf = new CursorAdapterArticulo(this, new ArticuloDao(this).
                 getCursor(null, null, null, null, ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
@@ -94,6 +96,9 @@ public class ActivityArticuloList extends AppCompatActivity {
                         ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE)));
                 f.setDescripcion(cur.getString(cur.getColumnIndex(
                         ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION)));
+                f.setMedida(cur.getString(cur.getColumnIndex(
+                        ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA
+                )).charAt(0));
                 f.setId_familia(Long.parseLong(cur.getString(cur.getColumnIndex(
                         ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA))));
 

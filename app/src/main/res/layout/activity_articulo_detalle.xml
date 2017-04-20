@@ -154,16 +154,31 @@
                 android:textColor="@android:color/darker_gray"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/et_articulo_medida"
+            <RadioGroup
+                android:id="@+id/radiogroup_medida"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:enabled="false"
-                android:inputType="numberDecimal|numberSigned"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="#383838"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:checkedButton="@+id/medida_u">
+                <RadioButton
+                    android:id="@+id/medida_u"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Unidades" />
+                <RadioButton
+                    android:id="@+id/medida_l"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Litros" />
+                <RadioButton
+                    android:id="@+id/medida_k"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Kilogramos" />
+            </RadioGroup>
 
             <TextView
                 android:id="@+id/tv_articulo_detalle_familia"
@@ -176,16 +191,11 @@
                 android:textColor="@android:color/darker_gray"
                 android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/et_articulo_familia"
+            <Spinner
+                android:id="@+id/spinner_familia"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:enabled="false"
-                android:inputType="number"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="#383838"
-                android:textStyle="bold" />
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
         </ScrollView>
 
@@ -193,7 +203,7 @@
 
     <LinearLayout
         android:id="@+id/LinearLayoutNavView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="vertical"

@@ -67,6 +67,8 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().setGroupCheckable(0, true, true);
+        navigation.getMenu().getItem(1).setChecked(true);
 
         contexto = this;
         familia = (Familia) getIntent().getSerializableExtra("Familia");

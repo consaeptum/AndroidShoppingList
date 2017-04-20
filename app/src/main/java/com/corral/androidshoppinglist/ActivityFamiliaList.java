@@ -68,6 +68,8 @@ public class ActivityFamiliaList extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().setGroupCheckable(0, true, true);
+        navigation.getMenu().getItem(1).setChecked(true);
 
         CursorAdapterFamilia caf = new CursorAdapterFamilia(this, new FamiliaDao(this).
                 getCursor(null, FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));

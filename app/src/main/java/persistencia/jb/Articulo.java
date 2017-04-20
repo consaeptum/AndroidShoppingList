@@ -1,5 +1,9 @@
 package persistencia.jb;
 
+import static util.Constantes.TIPO_MEDIDA_KILOGRAMOS;
+import static util.Constantes.TIPO_MEDIDA_LITROS;
+import static util.Constantes.TIPO_MEDIDA_UNIDADES;
+
 /**
  * JavaBean Articulo
  * Cada artículo debe pertenecer a una Familia.
@@ -18,7 +22,7 @@ public class Articulo implements java.io.Serializable {
         id_familia = 0L;
         nombre = "";
         descripcion = "";
-        medida = 'U';
+        medida = TIPO_MEDIDA_UNIDADES;
     }
 
     public Long getId() {
@@ -60,19 +64,19 @@ public class Articulo implements java.io.Serializable {
     /* Las medidas pueden ser (U)nidades, (L)itros, (K)ilogramos */
     public void setMedida(Character medida) {
 
-        if (Character.toUpperCase(medida) == 'U' ) {
-            this.medida = 'U';
+        if (Character.toUpperCase(medida) == TIPO_MEDIDA_UNIDADES ) {
+            this.medida = TIPO_MEDIDA_UNIDADES;
             return;
         }
-        if (Character.toUpperCase(medida) == 'L' ) {
-            this.medida = 'L';
+        if (Character.toUpperCase(medida) == TIPO_MEDIDA_LITROS ) {
+            this.medida = TIPO_MEDIDA_LITROS;
             return;
         }
-        if (Character.toUpperCase(medida) == 'K' ) {
-            this.medida = 'K';
+        if (Character.toUpperCase(medida) == TIPO_MEDIDA_KILOGRAMOS ) {
+            this.medida = TIPO_MEDIDA_KILOGRAMOS;
             return;
         }
-        this.medida = 'U';
+        this.medida = TIPO_MEDIDA_UNIDADES;
 
     }
 }

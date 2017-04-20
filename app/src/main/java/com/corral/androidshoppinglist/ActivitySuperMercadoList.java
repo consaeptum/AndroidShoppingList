@@ -68,6 +68,8 @@ public class ActivitySuperMercadoList extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().setGroupCheckable(0, true, true);
+        navigation.getMenu().getItem(0).setChecked(true);
 
         CursorAdapterSuperMercado caf = new CursorAdapterSuperMercado(this, new SuperMercadoDao(this).
                 getCursor(null, SuperMercadoContract.SuperMercadoEntry.COLUMN_NAME_NOMBRE));
@@ -117,7 +119,7 @@ public class ActivitySuperMercadoList extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_add) {
-            Intent intent = new Intent(this,ActivityArticuloDetalle.class);
+            Intent intent = new Intent(this,ActivitySuperMercadoDetalle.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

@@ -154,7 +154,6 @@ public class ArticuloDao {
         // How you want the results sorted in the resulting Cursor
         // String sortOrder = FeedEntry.COLUMN_NAME_SUBTITLE + " DESC";
 
-
         Cursor c = db.query(
                 ArticuloContract.ArticuloEntry.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
@@ -376,6 +375,7 @@ public class ArticuloDao {
             selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION + " LIKE ?");
             selectionArgs.add("%" + descrip + "%");
         }
+
         if (medida != null) {
             if ("ULK".indexOf(Character.toUpperCase(medida)) >= 0) {
                 if (selection.length() > 0) selection = selection.concat(" AND ");

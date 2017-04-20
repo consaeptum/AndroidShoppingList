@@ -3,6 +3,7 @@ package com.corral.androidshoppinglist;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
@@ -14,11 +15,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import persistencia.dao.ArticuloDao;
+import persistencia.dao.FamiliaContract;
+import persistencia.dao.FamiliaDao;
 import persistencia.jb.Articulo;
+import persistencia.jb.Familia;
 import util.BottomNavigationViewHelper;
+
+import static util.Constantes.TIPO_MEDIDA_KILOGRAMOS;
+import static util.Constantes.TIPO_MEDIDA_LITROS;
+import static util.Constantes.TIPO_MEDIDA_UNIDADES;
 
 public class ActivityArticuloDetalle extends AppCompatActivity {
 
@@ -67,9 +78,18 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().setGroupCheckable(0, true, true);
+        navigation.getMenu().getItem(2).setChecked(true);
 
         contexto = this;
         articulo = (Articulo) getIntent().getSerializableExtra("Articulo");
+
+        // definir el spinner de familias
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_familia);
+
+        CursorAdapterFamilia caf = new CursorAdapterFamilia(this, new FamiliaDao(this).
+                getCursor(null, FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));
+        spinner.setAdapter(caf);
 
         // si articulo null indica que no se va a modificar o eliminar porque no se envía una referencia.
         definirBotones(articulo == null);
@@ -179,14 +199,12 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         EditText et_codigo = (EditText) findViewById(R.id.et_articulo_codigo);
         EditText et_nombre = (EditText) findViewById(R.id.et_articulo_nombre);
         EditText et_descripcion = (EditText) findViewById(R.id.et_articulo_descripcion);
-        EditText et_medida = (EditText) findViewById(R.id.et_articulo_medida);
-        EditText et_familia = (EditText) findViewById(R.id.et_articulo_familia);
+        RadioGroup et_medida = (RadioGroup) findViewById(R.id.radiogroup_medida);
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_familia);
 
         Articulo f = new Articulo();
         if (et_nombre.getText().toString().length() == 0) throw new SQLiteConstraintException();
-        if (et_medida.getText().toString().length() == 0) throw new SQLiteConstraintException();
-        if (et_familia.getText().toString().length() == 0) throw new SQLiteConstraintException();
-
+        if (spinner.getSelectedItem() == null) throw new SQLiteConstraintException();
 
         try {
             f.setId(Long.parseLong(et_codigo.getText().toString()));
@@ -195,9 +213,27 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         }
         f.setNombre(et_nombre.getText().toString());
         f.setDescripcion(et_descripcion.getText().toString());
-        f.setMedida(et_descripcion.getText().charAt(0));
+
+        switch (et_medida.getCheckedRadioButtonId()) {
+            case R.id.medida_u: f.setMedida(TIPO_MEDIDA_UNIDADES);
+                break;
+            case R.id.medida_l: f.setMedida(TIPO_MEDIDA_LITROS);
+                break;
+            case R.id.medida_k: f.setMedida(TIPO_MEDIDA_KILOGRAMOS);
+                break;
+            default:    f.setMedida(TIPO_MEDIDA_UNIDADES);
+        }
+
         try {
-            f.setId_familia(Long.parseLong(et_familia.getText().toString()));
+            Cursor c = ((Cursor) spinner.getSelectedItem());
+            String seleccionado = c.getString(0).toString();
+            FamiliaDao fd = new FamiliaDao(this);
+            Familia familia = fd.read(Long.parseLong(seleccionado));
+            if (familia != null) {
+                f.setId_familia(familia.getId());
+            }
+            fd.close();
+
         } catch (Exception e) {
             throw new SQLiteConstraintException();
         }
@@ -209,14 +245,38 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         EditText et_codigo = (EditText) findViewById(R.id.et_articulo_codigo);
         EditText et_nombre = (EditText) findViewById(R.id.et_articulo_nombre);
         EditText et_descripcion = (EditText) findViewById(R.id.et_articulo_descripcion);
-        EditText et_medida = (EditText) findViewById(R.id.et_articulo_medida);
-        EditText et_familia = (EditText) findViewById(R.id.et_articulo_familia);
+        RadioGroup et_medida = (RadioGroup) findViewById(R.id.radiogroup_medida);
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_familia);
 
         et_codigo.setText(f.getId().toString(), TextView.BufferType.EDITABLE);
         et_nombre.setText(f.getNombre(), TextView.BufferType.EDITABLE);
         et_descripcion.setText(f.getDescripcion(), TextView.BufferType.EDITABLE);
-        et_medida.setText(f.getMedida().toString(), TextView.BufferType.EDITABLE);
-        et_familia.setText(f.getId_familia().toString(), TextView.BufferType.EDITABLE);
+
+        ((RadioButton) findViewById(R.id.medida_u)).setChecked(true);
+        if (TIPO_MEDIDA_UNIDADES.compareTo(f.getMedida()) == 0) {
+            ((RadioButton) findViewById(R.id.medida_u)).setChecked(true);
+        }
+        if (TIPO_MEDIDA_LITROS.compareTo(f.getMedida()) == 0) {
+            ((RadioButton) findViewById(R.id.medida_l)).setChecked(true);
+        }
+        if (TIPO_MEDIDA_KILOGRAMOS.compareTo(f.getMedida()) == 0) {
+            ((RadioButton) findViewById(R.id.medida_k)).setChecked(true);
+        }
+
+        FamiliaDao fd = new FamiliaDao(this);
+        Familia familia = fd.read(f.getId_familia());
+        if (familia != null) {
+
+            for (int i = 0; i < spinner.getCount(); i++) {
+                Cursor c = (Cursor) spinner.getItemAtPosition(i);
+                long id2 = c.getLong(c.getColumnIndex(FamiliaContract.FamiliaEntry._ID));
+                if (id2 == familia.getId()) {
+                    spinner.setSelection(i);
+                }
+
+            }
+        }
+        fd.close();
     }
 
     // Cambiar aparicencia de botones para mostrar Botón Guardar
@@ -227,8 +287,10 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         ((EditText) findViewById(R.id.et_articulo_codigo)).setEnabled(false);
         ((EditText) findViewById(R.id.et_articulo_nombre)).setEnabled(true);
         ((EditText) findViewById(R.id.et_articulo_descripcion)).setEnabled(true);
-        ((EditText) findViewById(R.id.et_articulo_medida)).setEnabled(true);
-        ((EditText) findViewById(R.id.et_articulo_familia)).setEnabled(true);
+        ((Spinner) findViewById(R.id.spinner_familia)).setEnabled(true);
+        ((RadioButton) findViewById(R.id.medida_u)).setEnabled(true);
+        ((RadioButton) findViewById(R.id.medida_k)).setEnabled(true);
+        ((RadioButton) findViewById(R.id.medida_l)).setEnabled(true);
     }
 
     // Cambiar apariencia de botones para mostrar Botones Modificar y Eliminar.
@@ -236,6 +298,11 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonEliminar)).setVisibility(View.VISIBLE);
         ((Button) findViewById(R.id.buttonModificar)).setVisibility(View.VISIBLE);
         ((Button) findViewById(R.id.buttonGuardar)).setVisibility(View.GONE);
+        ((Spinner) findViewById(R.id.spinner_familia)).setEnabled(false);
+        ((RadioButton) findViewById(R.id.medida_u)).setEnabled(false);
+        ((RadioButton) findViewById(R.id.medida_k)).setEnabled(false);
+        ((RadioButton) findViewById(R.id.medida_l)).setEnabled(false);
+
     }
 
 }

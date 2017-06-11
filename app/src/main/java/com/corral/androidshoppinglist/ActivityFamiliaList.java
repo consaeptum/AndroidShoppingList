@@ -2,12 +2,13 @@ package com.corral.androidshoppinglist;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,9 +39,6 @@ public class ActivityFamiliaList extends AppCompatActivity {
                     finish();
                     return true;
                 case R.id.navigation_familia:
-                    intent = new Intent(getApplicationContext(),ActivityFamiliaList.class);
-                    startActivity(intent);
-                    finish();
                     return true;
                 case R.id.navigation_articulo:
                     intent = new Intent(getApplicationContext(),ActivityArticuloList.class);
@@ -48,9 +46,9 @@ public class ActivityFamiliaList extends AppCompatActivity {
                     finish();
                     return true;
                 case R.id.navigation_lista:
-                    //intent = new Intent(getApplicationContext(),ActivityListaList.class);
-                    //startActivity(intent);
-                    // finish();
+                    intent = new Intent(getApplicationContext(),ActivityListaList.class);
+                    startActivity(intent);
+                    finish();
                     return true;
             }
             return false;
@@ -62,8 +60,17 @@ public class ActivityFamiliaList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_familia_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        final Context este = this;
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(este, ActivityFamiliaDetalle.class);
+                startActivity(intent);
+            }
+        });
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);

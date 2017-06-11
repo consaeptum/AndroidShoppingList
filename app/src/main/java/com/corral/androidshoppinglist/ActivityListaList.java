@@ -16,13 +16,13 @@ import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 
-import persistencia.dao.ArticuloContract;
-import persistencia.dao.ArticuloDao;
-import persistencia.jb.Articulo;
+import persistencia.dao.ListaContract;
+import persistencia.dao.ListaDao;
+import persistencia.jb.Lista;
 import util.BottomNavigationViewHelper;
 
 
-public class ActivityArticuloList extends AppCompatActivity {
+public class ActivityListaList extends AppCompatActivity {
 
     ListView lv;
 
@@ -45,11 +45,11 @@ public class ActivityArticuloList extends AppCompatActivity {
                     finish();
                     return true;
                 case R.id.navigation_articulo:
-                    return true;
-                case R.id.navigation_lista:
-                    intent = new Intent(getApplicationContext(),ActivityListaList.class);
+                    intent = new Intent(getApplicationContext(),ActivityArticuloList.class);
                     startActivity(intent);
                     finish();
+                    return true;
+                case R.id.navigation_lista:
                     return true;
             }
             return false;
@@ -61,34 +61,30 @@ public class ActivityArticuloList extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_articulo_list);
+        setContentView(R.layout.activity_lista_list);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
 
         final Context este = this;
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.floatingActionButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(este, ActivityArticuloDetalle.class);
+                Intent intent = new Intent(este, ActivityListaDetalle.class);
                 startActivity(intent);
             }
         });
-
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.getMenu().setGroupCheckable(0, true, true);
-        navigation.getMenu().getItem(2).setChecked(true);
+        navigation.getMenu().getItem(3).setChecked(true);
 
-        CursorAdapterArticulo caf = new CursorAdapterArticulo(this, new ArticuloDao(this).
-                getCursor(null, null, null, null, ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
+        CursorAdapterLista caf = new CursorAdapterLista(this, new ListaDao(this).
+                getCursor(null, null, null, ListaContract.ListaEntry.COLUMN_NAME_FECHA));
 
 
-        lv = ((ListView)findViewById(R.id.listaArticulo));
+        lv = ((ListView)findViewById(R.id.listaLista));
         lv.setAdapter(caf);
 
         // Al hacer click en un elemento de la lista
@@ -98,34 +94,30 @@ public class ActivityArticuloList extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Articulo f = new Articulo();
+                Lista f = new Lista();
                 Cursor cur = (Cursor) lv.getAdapter().getItem(position);
                 cur.moveToPosition(position);
                 f.setId(cur.getLong(cur.getColumnIndex(
-                        ArticuloContract.ArticuloEntry._ID)));
-                f.setNombre(cur.getString(cur.getColumnIndex(
-                        ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE)));
-                f.setDescripcion(cur.getString(cur.getColumnIndex(
-                        ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION)));
-                f.setMedida(cur.getString(cur.getColumnIndex(
-                        ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA
-                )).charAt(0));
-                f.setId_familia(Long.parseLong(cur.getString(cur.getColumnIndex(
-                        ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA))));
+                        ListaContract.ListaEntry._ID)));
+                f.setFechaFormatYMD(cur.getString(cur.getColumnIndex(
+                        ListaContract.ListaEntry.COLUMN_NAME_FECHA)));
+                f.setId_super(Long.parseLong(cur.getString(cur.getColumnIndex(
+                        ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER))));
+                f.setImporte(cur.getFloat(cur.getColumnIndex(
+                        ListaContract.ListaEntry.COLUMN_NAME_IMPORTE)));
 
-                Intent intent = new Intent(contexto,ActivityArticuloDetalle.class);
-                intent.putExtra("Articulo", f);
+                Intent intent = new Intent(contexto,ActivityListaDetalle.class);
+                intent.putExtra("Lista", f);
                 startActivity(intent);
             }
         });
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ((CursorAdapter)lv.getAdapter()).changeCursor(new ArticuloDao(this).
-                getCursor(null, null, null, null, ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
+        ((CursorAdapter)lv.getAdapter()).changeCursor(new ListaDao(this).
+                getCursor(null, null, null, ListaContract.ListaEntry.COLUMN_NAME_FECHA));
     }
 
 
@@ -143,7 +135,7 @@ public class ActivityArticuloList extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_add) {
-            Intent intent = new Intent(this,ActivityArticuloDetalle.class);
+            Intent intent = new Intent(this,ActivityListaDetalle.class);
             startActivity(intent);
         }
         return super.onOptionsItemSelected(item);

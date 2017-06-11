@@ -3,6 +3,7 @@ package com.corral.androidshoppinglist;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
@@ -12,10 +13,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.List;
+
+import persistencia.dao.ArticuloDao;
 import persistencia.dao.FamiliaDao;
 import persistencia.jb.Familia;
 import util.BottomNavigationViewHelper;
@@ -39,9 +44,6 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
                     finish();
                     return true;
                 case R.id.navigation_familia:
-                    intent = new Intent(getApplicationContext(),ActivityFamiliaList.class);
-                    startActivity(intent);
-                    finish();
                     return true;
                 case R.id.navigation_articulo:
                     intent = new Intent(getApplicationContext(),ActivityArticuloList.class);
@@ -49,9 +51,9 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
                     finish();
                     return true;
                 case R.id.navigation_lista:
-                    //intent = new Intent(getApplicationContext(),ActivityListaList.class);
-                    //startActivity(intent);
-                    // finish();
+                    intent = new Intent(getApplicationContext(),ActivityListaList.class);
+                    startActivity(intent);
+                    finish();
                     return true;
             }
             return false;
@@ -60,9 +62,15 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
     };
 
     @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_familia_detalle);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
@@ -79,6 +87,7 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         if (familia != null) {
             rellenaCampos(familia);
         }
+
     }
 
     private void definirBotones(Boolean opcionGuardar) {
@@ -102,23 +111,34 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonEliminar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
-                builder
-                        .setTitle("Eliminar Familia")
-                        .setMessage("Confirme la operación, por favor.")
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (familia != null) {
-                                    FamiliaDao fd = new FamiliaDao(contexto);
-                                    fd.delete(familia.getId());
-                                    fd.close();
+                if (familiaLibre(familia.getId())) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
+                    builder
+                            .setTitle("Eliminar Familia")
+                            .setMessage("Confirme la operación, por favor.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (familia != null) {
+                                        FamiliaDao fd = new FamiliaDao(contexto);
+                                        fd.delete(familia.getId());
+                                        fd.close();
+                                    }
+                                    finish();
                                 }
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("Cancelar", null)    //Do nothing on no
-                        .show();
+                            })
+                            .setNegativeButton("Cancelar", null)    //Do nothing on no
+                            .show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
+                    builder
+                            .setTitle("Eliminar Familia ERROR")
+                            .setMessage("No es posible eliminar una familia de artículos " +
+                                    "mientras haya artículos pertenecientes a esta.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Aceptar", null)
+                            .show();
+                }
             }
         });
 
@@ -126,6 +146,10 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonModificar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                EditText et = ((EditText) findViewById(R.id.et_familia_nombre));
+                et.requestFocus();
+                imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
                 aparienciaGuardar();
             }
         });
@@ -140,6 +164,12 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
                     try {
                         familia = obtenCampos();
                         fd.insert(familia);
+
+                        // En caso de haber creado una nueva familia desde ActivityArticuloDetalle
+                        // retornamos el resultado del Id de la familia con setResult().
+                        // Si no se pasó por ActivityArticuloDetalle simplemente se ignora Result.
+                        setResult(familia.getId().intValue());
+
                     } catch (SQLiteException sqlce) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
                         builder
@@ -217,4 +247,10 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonGuardar)).setVisibility(View.GONE);
     }
 
+    // indica si una familia tiene artículos que apunten a esta (true) o no (false).
+    private Boolean familiaLibre(Long id_familia) {
+        ArticuloDao ad = new ArticuloDao(this);
+        List articulos_ = ad.listado(null, null, null, id_familia, null);
+        return (articulos_.size() == 0);
+    }
 }

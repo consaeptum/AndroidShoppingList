@@ -3,16 +3,19 @@ package com.corral.androidshoppinglist;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -20,19 +23,22 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.List;
+
 import persistencia.dao.ArticuloDao;
 import persistencia.dao.FamiliaContract;
 import persistencia.dao.FamiliaDao;
+import persistencia.dao.LineaDao;
 import persistencia.jb.Articulo;
 import persistencia.jb.Familia;
 import util.BottomNavigationViewHelper;
 
 import static util.Constantes.TIPO_MEDIDA_KILOGRAMOS;
-import static util.Constantes.TIPO_MEDIDA_LITROS;
 import static util.Constantes.TIPO_MEDIDA_UNIDADES;
 
 public class ActivityArticuloDetalle extends AppCompatActivity {
 
+    private static final int ERROR_INSERT = -1;
     Context contexto;
     Articulo articulo;
 
@@ -55,14 +61,11 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
                     finish();
                     return true;
                 case R.id.navigation_articulo:
-                    intent = new Intent(getApplicationContext(),ActivityArticuloList.class);
-                    startActivity(intent);
-                    finish();
                     return true;
                 case R.id.navigation_lista:
-                    //intent = new Intent(getApplicationContext(),ActivityListaList.class);
-                    //startActivity(intent);
-                    // finish();
+                    intent = new Intent(getApplicationContext(),ActivityListaList.class);
+                    startActivity(intent);
+                    finish();
                     return true;
             }
             return false;
@@ -71,9 +74,16 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
     };
 
     @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articulo_detalle);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
@@ -120,23 +130,35 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonEliminar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
-                builder
-                        .setTitle("Eliminar Articulo")
-                        .setMessage("Confirme la operación, por favor.")
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (articulo != null) {
-                                    ArticuloDao fd = new ArticuloDao(contexto);
-                                    fd.delete(articulo.getId());
-                                    fd.close();
+                if (articuloLibre(articulo.getId())) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
+                    builder
+                            .setTitle("Eliminar Articulo")
+                            .setMessage("Confirme la operación, por favor.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (articulo != null) {
+                                        ArticuloDao fd = new ArticuloDao(contexto);
+                                        fd.delete(articulo.getId());
+                                        fd.close();
+                                    }
+                                    finish();
                                 }
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("Cancelar", null)    //Do nothing on no
-                        .show();
+                            })
+                            .setNegativeButton("Cancelar", null)    //Do nothing on no
+                            .show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
+                    builder
+                            .setTitle("Eliminar Artículo ERROR")
+                            .setMessage("No es posible eliminar artículos " +
+                                    "mientras haya artículos pertenecientes a una lista.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Aceptar", null)
+                            .show();
+
+                }
             }
         });
 
@@ -144,6 +166,10 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonModificar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                EditText et = ((EditText) findViewById(R.id.et_articulo_nombre));
+                et.requestFocus();
+                imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
                 aparienciaGuardar();
             }
         });
@@ -157,7 +183,16 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
                 if (articulo == null) {
                     try {
                         articulo = obtenCampos();
-                        fd.insert(articulo);
+                        Boolean res = fd.insert(articulo);
+
+                        // En caso de haber creado una nuevo articulo desde una Card de la Lista
+                        // retornamos el resultado del Id del articulo con setResult().
+                        // Si no se pasó por Card simplemente se ignora Result.
+                        // Aunque el startActivityForResult se llamó desde RVArticulosAdapter,
+                        // como el context pertenece a ActivityListaDetalle, el resultado se
+                        // recoge en ActivityListaDetalle.onActivityResult().
+                        setResult((res)? articulo.getId().intValue() : ERROR_INSERT);
+
                     } catch (SQLiteException sqlce) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
                         builder
@@ -167,6 +202,7 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
                                 .setPositiveButton("Ok", null)
                                 .show();
                         fd.close();
+                        setResult(ERROR_INSERT);
                         return;
                     }
 
@@ -190,6 +226,38 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
                 finish();
             }
         });
+
+        // boton Familia nueva.  lanza la activity para crear nueva familia.
+        FloatingActionButton nuevaFamilia = (FloatingActionButton) findViewById(R.id.boton_articulo_nueva_familia);
+        nuevaFamilia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            Intent intent = new Intent(getApplicationContext(),ActivityFamiliaDetalle.class);
+            startActivityForResult(intent, 0);
+            }
+        });
+    }
+
+    // Cuando se añade una familia desde Artículo, lanzamos la activity FamiliaActivityDetalle
+    // con startActivityForResult.  Aquí especificamos que hacer al recibir el resultado y el
+    // objeto familia que nos envía ActivityFamiliaDetalle al pulsar el botón guardar.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0 ) {
+            if (resultCode >= 0) {
+                Spinner spiner = (Spinner) findViewById(R.id.spinner_familia);
+                CursorAdapterFamilia caf = new CursorAdapterFamilia(this, new FamiliaDao(this).
+                        getCursor(null, FamiliaContract.FamiliaEntry.COLUMN_NAME_NOMBRE));
+                spiner.setAdapter(caf);
+                for (int i = 0; i < spiner.getCount(); i++) {
+                    Cursor c = (Cursor) spiner.getItemAtPosition(i);
+                    long id = c.getLong(c.getColumnIndex(FamiliaContract.FamiliaEntry._ID));
+                    if (id == resultCode) {
+                        spiner.setSelection(i);
+                    }
+                }
+            }
+        }
     }
 
     // Devuelve Articulo leyéndolo de los EditText.
@@ -217,8 +285,8 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         switch (et_medida.getCheckedRadioButtonId()) {
             case R.id.medida_u: f.setMedida(TIPO_MEDIDA_UNIDADES);
                 break;
-            case R.id.medida_l: f.setMedida(TIPO_MEDIDA_LITROS);
-                break;
+            //case R.id.medida_l: f.setMedida(TIPO_MEDIDA_LITROS);
+                //break;
             case R.id.medida_k: f.setMedida(TIPO_MEDIDA_KILOGRAMOS);
                 break;
             default:    f.setMedida(TIPO_MEDIDA_UNIDADES);
@@ -256,13 +324,14 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         if (TIPO_MEDIDA_UNIDADES.compareTo(f.getMedida()) == 0) {
             ((RadioButton) findViewById(R.id.medida_u)).setChecked(true);
         }
-        if (TIPO_MEDIDA_LITROS.compareTo(f.getMedida()) == 0) {
-            ((RadioButton) findViewById(R.id.medida_l)).setChecked(true);
-        }
+        //if (TIPO_MEDIDA_LITROS.compareTo(f.getMedida()) == 0) {
+        //    ((RadioButton) findViewById(R.id.medida_l)).setChecked(true);
+        //}
         if (TIPO_MEDIDA_KILOGRAMOS.compareTo(f.getMedida()) == 0) {
             ((RadioButton) findViewById(R.id.medida_k)).setChecked(true);
         }
 
+        // ponemos como seleccionada en el spinner la familia correspondiente
         FamiliaDao fd = new FamiliaDao(this);
         Familia familia = fd.read(f.getId_familia());
         if (familia != null) {
@@ -288,9 +357,10 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         ((EditText) findViewById(R.id.et_articulo_nombre)).setEnabled(true);
         ((EditText) findViewById(R.id.et_articulo_descripcion)).setEnabled(true);
         ((Spinner) findViewById(R.id.spinner_familia)).setEnabled(true);
+        ((FloatingActionButton) findViewById(R.id.boton_articulo_nueva_familia)).setEnabled(true);
         ((RadioButton) findViewById(R.id.medida_u)).setEnabled(true);
         ((RadioButton) findViewById(R.id.medida_k)).setEnabled(true);
-        ((RadioButton) findViewById(R.id.medida_l)).setEnabled(true);
+        //((RadioButton) findViewById(R.id.medida_l)).setEnabled(true);
     }
 
     // Cambiar apariencia de botones para mostrar Botones Modificar y Eliminar.
@@ -299,10 +369,17 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonModificar)).setVisibility(View.VISIBLE);
         ((Button) findViewById(R.id.buttonGuardar)).setVisibility(View.GONE);
         ((Spinner) findViewById(R.id.spinner_familia)).setEnabled(false);
+        ((FloatingActionButton) findViewById(R.id.boton_articulo_nueva_familia)).setEnabled(false);
         ((RadioButton) findViewById(R.id.medida_u)).setEnabled(false);
         ((RadioButton) findViewById(R.id.medida_k)).setEnabled(false);
-        ((RadioButton) findViewById(R.id.medida_l)).setEnabled(false);
+        //((RadioButton) findViewById(R.id.medida_l)).setEnabled(false);
 
+    }
+    // indica si un Artículo tiene listas que apunten a este (true) o no (false).
+    private Boolean articuloLibre(Long id_articulo) {
+        LineaDao ad = new LineaDao(this);
+        List articulos_ = ad.listado(null, id_articulo, null);
+        return (articulos_.size() == 0);
     }
 
 }

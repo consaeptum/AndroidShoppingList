@@ -2,6 +2,7 @@ package com.corral.androidshoppinglist;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import persistencia.dao.SuperMercadoContract;
+import util.Constantes;
 
 public class CursorAdapterSuperMercado extends CursorAdapter {
 
@@ -19,21 +21,23 @@ public class CursorAdapterSuperMercado extends CursorAdapter {
         super(context, cursor, 0);
     }
 
-    private int[] colors = new int[] { 0xFFC7E8F9, 0xFFFFFFFF };
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = super.getView(position, convertView, parent);
-        int colorPos = position % colors.length;
-        view.setBackgroundColor(colors[colorPos]);
+        view.setBackgroundColor(Color.WHITE);
 
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Animation animation1 = new AlphaAnimation(1.0f, 0.3f);
-                animation1.setDuration(500);
-                v.setBackgroundColor(0xFF8796E1);
-                v.startAnimation(animation1);
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    Animation animation1 = new AlphaAnimation(1.0f, 0.3f);
+                    animation1.setDuration(500);
+                    v.setBackgroundColor(Constantes.COLOR_LISTA_SELECCIONADA);
+                    v.startAnimation(animation1);
+                    v.setBackgroundColor(Color.WHITE);
+                }
                 return false;
             }
         });

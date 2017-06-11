@@ -3,6 +3,7 @@ package com.corral.androidshoppinglist;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
@@ -12,10 +13,14 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.List;
+
+import persistencia.dao.ListaDao;
 import persistencia.dao.SuperMercadoDao;
 import persistencia.jb.SuperMercado;
 import util.BottomNavigationViewHelper;
@@ -34,9 +39,6 @@ public class ActivitySuperMercadoDetalle extends AppCompatActivity {
             Intent intent;
             switch (item.getItemId()) {
                 case R.id.navigation_supermercado:
-                    intent = new Intent(getApplicationContext(),ActivitySuperMercadoList.class);
-                    startActivity(intent);
-                    finish();
                     return true;
                 case R.id.navigation_familia:
                     intent = new Intent(getApplicationContext(),ActivityFamiliaList.class);
@@ -49,9 +51,9 @@ public class ActivitySuperMercadoDetalle extends AppCompatActivity {
                     finish();
                     return true;
                 case R.id.navigation_lista:
-                    //intent = new Intent(getApplicationContext(),ActivityListaList.class);
-                    //startActivity(intent);
-                    // finish();
+                    intent = new Intent(getApplicationContext(),ActivityListaList.class);
+                    startActivity(intent);
+                    finish();
                     return true;
             }
             return false;
@@ -60,9 +62,16 @@ public class ActivitySuperMercadoDetalle extends AppCompatActivity {
     };
 
     @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_supermercado_detalle);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         BottomNavigationViewHelper.disableShiftMode(navigation);
@@ -102,23 +111,36 @@ public class ActivitySuperMercadoDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonEliminar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
-                builder
-                        .setTitle("Eliminar SuperMercado")
-                        .setMessage("Confirme la operación, por favor.")
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (supermercado != null) {
-                                    SuperMercadoDao fd = new SuperMercadoDao(contexto);
-                                    fd.delete(supermercado.getId());
-                                    fd.close();
+
+                if (superMercadoLibre(supermercado.getId())) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
+                    builder
+                            .setTitle("Eliminar SuperMercado")
+                            .setMessage("Confirme la operación, por favor.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (supermercado != null) {
+                                        SuperMercadoDao fd = new SuperMercadoDao(contexto);
+                                        fd.delete(supermercado.getId());
+                                        fd.close();
+                                    }
+                                    finish();
                                 }
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("Cancelar", null)    //Do nothing on no
-                        .show();
+                            })
+                            .setNegativeButton("Cancelar", null)    //Do nothing on no
+                            .show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
+                    builder
+                            .setTitle("Eliminar Supermercado ERROR")
+                            .setMessage("No es posible eliminar un supermercado " +
+                                    "mientras haya listas que lo contengan.")
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton("Aceptar", null)
+                            .show();
+
+                }
             }
         });
 
@@ -126,6 +148,10 @@ public class ActivitySuperMercadoDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonModificar)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                EditText et = ((EditText) findViewById(R.id.et_supermercado_nombre));
+                et.requestFocus();
+                imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
                 aparienciaGuardar();
             }
         });
@@ -140,6 +166,12 @@ public class ActivitySuperMercadoDetalle extends AppCompatActivity {
                     try {
                         supermercado = obtenCampos();
                         fd.insert(supermercado);
+
+                        // En caso de haber creado un nuevo supermercado desde ActivityListaDetalle
+                        // retornamos el resultado del Id del supermercado con setResult().
+                        // Si no se pasó por ActivityArticuloDetalle simplemente se ignora Result.
+                        setResult(supermercado.getId().intValue());
+
                     } catch (SQLiteException sqlce) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
                         builder
@@ -215,6 +247,13 @@ public class ActivitySuperMercadoDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonEliminar)).setVisibility(View.VISIBLE);
         ((Button) findViewById(R.id.buttonModificar)).setVisibility(View.VISIBLE);
         ((Button) findViewById(R.id.buttonGuardar)).setVisibility(View.GONE);
+    }
+
+    // indica si una supermercado tiene listas que apunten este supermercado (true) o no (false).
+    private Boolean superMercadoLibre(Long id_super) {
+        ListaDao ad = new ListaDao(this);
+        List supermercados_ = ad.listado(null, null, id_super, null);
+        return (supermercados_.size() == 0);
     }
 
 }

@@ -6,7 +6,13 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.corral.androidshoppinglist.ActivityArticuloList"
-    tools:showIn="@layout/activity_articulo_list">
+    tools:showIn="@layout/activity_articulo_list"
+    android:layout_marginBottom="?android:attr/actionBarSize">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:src="@drawable/carro_de_la_compra"/>
 
     <ListView
         android:id="@+id/listaArticulo"

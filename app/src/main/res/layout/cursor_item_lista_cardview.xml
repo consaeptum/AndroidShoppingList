@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp">
+
+        <LinearLayout
+            android:id="@+id/layout_item_lista_articulo_visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/espacio_superior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="5dp">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:paddingLeft="4dp">
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/boton_articulo_nueva_articulo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:scaleType="fitCenter"
+                        android:theme="@style/AppTheme"
+                        app:backgroundTint="#FFB8D29C"
+                        app:elevation="0dp"
+                        app:fabSize="mini"
+                        app:srcCompat="@mipmap/new_item" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/boton_articulo_borrar_articulo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:scaleType="fitCenter"
+                        android:clickable="true"
+                        android:theme="@style/AppTheme"
+                        android:tint="@color/colorPrimary"
+                        android:visibility="gone"
+                        app:elevation="0dp"
+                        app:backgroundTint="#FFF5F7A7"
+                        app:fabSize="mini"
+                        app:srcCompat="@android:drawable/ic_delete" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/boton_articulo_desplegar_articulo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:scaleType="fitCenter"
+                        android:clickable="true"
+                        android:theme="@style/AppTheme"
+                        android:tint="@color/colorPrimary"
+                        android:visibility="gone"
+                        app:elevation="0dp"
+                        app:backgroundTint="#FFF5F7A7"
+                        app:fabSize="mini"
+                        app:srcCompat="@android:drawable/ic_menu_sort_by_size" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lista_tv_botonmasarticulo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="2" />
+
+                        <TextView
+                            android:id="@+id/lista_tv_articulo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="5"
+                            android:text="artículo" />
+
+                        <TextView
+                            android:id="@+id/lista_tv_cantidad"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="3"
+                            android:gravity="center"
+                            android:text="cantidad" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/autocompletetextview_item_lista_articulo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|start"
+                            android:layout_weight="8"
+                            android:gravity="center_vertical"
+                            android:hint="escriba aquí el producto"
+                            android:inputType="textCapSentences|textMultiLine"
+                            android:maxLines="1"
+                            android:textAlignment="gravity"
+                            android:textColor="@drawable/auto_complete_text_selector" />
+
+                        <EditText
+                            android:id="@+id/lista_item_cantidad"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_weight="3"
+                            android:ems="10"
+                            android:enabled="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:hint="0.0"
+                            android:imeOptions="actionDone"
+                            android:inputType="numberDecimal"
+                            android:maxLines="1"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:visibility="visible" />
+
+                        <Spinner
+                            android:id="@+id/lista_item_numberPicker"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:layout_weight="2"
+                            android:visibility="visible"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_boton_check"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:orientation="horizontal"
+                    android:paddingRight="4dp"
+                    android:visibility="gone">
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/botonCheckCompraOff"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:scaleType="fitCenter"
+                        android:src="@mipmap/tick"
+                        android:visibility="gone"
+                        android:theme="@style/AppTheme"
+                        app:backgroundTint="?android:attr/colorPressedHighlight"
+                        app:elevation="0dp"
+                        app:fabSize="mini" />
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:id="@+id/botonCheckCompraOn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:scaleType="fitCenter"
+                        android:src="@mipmap/tickverde"
+                        android:visibility="gone"
+                        android:theme="@style/AppTheme"
+                        app:backgroundTint="@android:color/white"
+                        app:elevation="0dp"
+                        app:fabSize="mini" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/espacio_inferior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="5dp">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/cv_informacion_extra"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="5dp"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/cv_descripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:hint="Para comparar el precio con otros supermercados puede anotar aquí la marca y los gramos o litros del embase. O si lo prefiere, puede crear un artículo nuevo especificando en el nombre el peso y la marca para diferenciarlo de un producto genérico."
+                    android:textAlignment="gravity"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                    android:textStyle="italic" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:textColor="#ffffff"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text=" Precio " />
+
+                    <EditText
+                        android:id="@+id/cv_edit_text_pvp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:foreground="@color/cardview_light_background"
+                        android:gravity="center_horizontal"
+                        android:hint="Introduzca el precio aquí"
+                        android:imeOptions="actionDone"
+                        android:inputType="numberDecimal"
+                        android:textAlignment="gravity"
+                        android:textColor="#ffffff"
+                        android:textColorHint="#ffffff"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="left"
+                        android:textColor="#ffffff"
+                        android:textStyle="bold"
+                        android:layout_weight="1"
+                        android:text=" € " />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/cv_texto_comparativa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="Comparativa de precios"
+                    android:textColor="@android:color/holo_red_dark" />
+
+                <TableLayout
+                    android:id="@+id/tablelayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" >
+
+                        <TextView
+                            android:id="@+id/cv_super"
+                            android:layout_width="0dp"
+                            android:layout_weight="4"
+                            android:layout_height="wrap_content"
+                            android:text="supermercado"
+                            android:gravity="left"
+                            android:padding="3dip"/>
+                        <TextView
+                            android:id="@+id/cv_pvp"
+                            android:layout_width="0dp"
+                            android:layout_weight="4"
+                            android:layout_height="wrap_content"
+                            android:text="pvp"
+                            android:gravity="right"
+                            android:padding="3dip"/>
+                        <TextView
+                            android:id="@+id/cv_fecha"
+                            android:layout_width="0dp"
+                            android:layout_weight="4"
+                            android:layout_height="wrap_content"
+                            android:text="fecha"
+                            android:gravity="center_horizontal"
+                            android:padding="3dip"/>
+
+                    </TableRow>
+
+
+                </TableLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
+

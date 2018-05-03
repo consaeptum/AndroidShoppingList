@@ -34,6 +34,7 @@
                 android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="#bac2f8"
+                android:drawableLeft="@android:drawable/ic_menu_revert"
                 android:text="Volver" />
 
             <Button
@@ -53,6 +54,7 @@
                 android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="#b1c1c9"
+                android:drawableLeft="@android:drawable/ic_menu_delete"
                 android:text="Eliminar"
                 android:visibility="visible" />
 
@@ -79,7 +81,8 @@
             android:text="código"
             android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
             android:textColor="@android:color/darker_gray"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
         <EditText
             android:id="@+id/et_supermercado_codigo"
@@ -91,7 +94,8 @@
             android:inputType="number"
             android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
             android:textColor="#383838"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
         <TextView
             android:id="@+id/tv_supermercado_detalle_nombre"

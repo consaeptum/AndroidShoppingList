@@ -33,4 +33,17 @@
         app:itemTextColor="@drawable/selector_bottom_nav"
         app:menu="@menu/navigation" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="?attr/listPreferredItemHeightLarge"
+        android:layout_marginRight="20dp"
+        android:clickable="true"
+        app:backgroundTint="#1836f8"
+        app:fabSize="mini"
+        app:srcCompat="@android:drawable/ic_input_add" />
+
+
 </android.support.design.widget.CoordinatorLayout>

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.corral.androidshoppinglist.ActivityArticuloList">
+    tools:context="com.corral.androidshoppinglist.ActivityListaList">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -18,11 +18,12 @@
             android:background="?attr/colorPrimary"
             android:clickable="true"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:title="Articulos" />
+            app:title="Listas" />
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_activity_articulo_list" />
+    <include layout="@layout/content_activity_lista_list"
+        android:id="@+id/include" />
 
 
     <android.support.design.widget.BottomNavigationView
@@ -46,7 +47,6 @@
         app:backgroundTint="#1836f8"
         app:fabSize="mini"
         app:srcCompat="@android:drawable/ic_input_add" />
-
 
 </android.support.design.widget.CoordinatorLayout>
 

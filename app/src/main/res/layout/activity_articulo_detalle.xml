@@ -34,6 +34,7 @@
                 android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="#bac2f8"
+                android:drawableLeft="@android:drawable/ic_menu_revert"
                 android:text="Volver" />
 
             <Button
@@ -53,6 +54,7 @@
                 android:layout_margin="3dp"
                 android:layout_weight="1"
                 android:background="#b1c1c9"
+                android:drawableLeft="@android:drawable/ic_menu_delete"
                 android:text="Eliminar"
                 android:visibility="visible" />
 
@@ -67,137 +69,148 @@
                 android:visibility="gone" />
         </LinearLayout>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="?attr/actionBarSize">
 
-        <LinearLayout
-            android:id="@+id/LinearLayoutTextViews"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#ffffff"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_articulo_detalle_codigo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/fab_margin"
-                android:text="código"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="@android:color/darker_gray"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/et_articulo_codigo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:enabled="false"
-                android:focusable="false"
-                android:inputType="number"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="#383838"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_articulo_detalle_nombre"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Nombre artículo"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="@android:color/darker_gray"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/et_articulo_nombre"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:enabled="false"
-                android:inputType="text|textCapSentences"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="#383838"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_articulo_detalle_descripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Descripción"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="@android:color/darker_gray"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/et_articulo_descripcion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:enabled="false"
-                android:inputType="text|textCapSentences"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="#383838"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_articulo_detalle_medida"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Unidad de medida"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="@android:color/darker_gray"
-                android:textStyle="bold" />
-
-            <RadioGroup
-                android:id="@+id/radiogroup_medida"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:checkedButton="@+id/medida_u">
-                <RadioButton
-                    android:id="@+id/medida_u"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/LinearLayoutTextViews"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Unidades" />
-                <RadioButton
-                    android:id="@+id/medida_l"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Litros" />
-                <RadioButton
-                    android:id="@+id/medida_k"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Kilogramos" />
-            </RadioGroup>
+                    android:background="#ffffff"
+                    android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_articulo_detalle_familia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/fab_margin"
-                android:text="familia"
-                android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
-                android:textColor="@android:color/darker_gray"
-                android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/tv_articulo_detalle_codigo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/fab_margin"
+                        android:text="código"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="@android:color/darker_gray"
+                        android:textStyle="bold"
+                        android:visibility="gone"/>
 
-            <Spinner
-                android:id="@+id/spinner_familia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                    <EditText
+                        android:id="@+id/et_articulo_codigo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:enabled="false"
+                        android:focusable="false"
+                        android:inputType="number"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="#383838"
+                        android:textStyle="bold"
+                        android:visibility="gone"/>
 
-        </LinearLayout>
-        </ScrollView>
+                    <TextView
+                        android:id="@+id/tv_articulo_detalle_nombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Nombre artículo"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="@android:color/darker_gray"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_articulo_nombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:enabled="false"
+                        android:inputType="text|textCapSentences"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="#383838"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_articulo_detalle_descripcion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Notas"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="@android:color/darker_gray"
+                        android:textStyle="bold" />
+
+                    <EditText
+                        android:id="@+id/et_articulo_descripcion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:enabled="false"
+                        android:inputType="text|textCapSentences"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="#383838"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_articulo_detalle_familia"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/fab_margin"
+                        android:text="familia"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="@android:color/darker_gray"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/spinner_familia"
+                            android:layout_width="0px"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1" />
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/boton_articulo_nueva_familia"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            app:backgroundTint="@android:color/holo_blue_dark"
+                            app:fabSize="mini"
+                            app:srcCompat="@android:drawable/ic_input_add" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_articulo_detalle_medida"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
+                        android:text="Unidad de medida"
+                        android:textAppearance="@android:style/TextAppearance.Holo.DialogWindowTitle"
+                        android:textColor="@android:color/darker_gray"
+                        android:textStyle="bold" />
+
+                    <RadioGroup
+                        android:id="@+id/radiogroup_medida"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:checkedButton="@+id/medida_u">
+                        <RadioButton
+                            android:id="@+id/medida_u"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Unidades" />
+
+                        <RadioButton
+                            android:id="@+id/medida_k"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Kilogramos" />
+
+                    </RadioGroup>
+
+                </LinearLayout>
 
     </LinearLayout>
 
@@ -207,6 +220,8 @@
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -222,7 +237,7 @@
             app:itemBackground="@color/colorPrimary"
             app:itemIconTint="@drawable/selector_bottom_nav"
             app:itemTextColor="@drawable/selector_bottom_nav"
-            app:menu="@menu/navigation" />
+            app:menu="@menu/navigation"/>
     </LinearLayout>
 
 

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#838cc7</color>
-    <color name="colorPrimaryDark">#303f9f</color>
-    <color name="colorAccent">#0c13e5</color>
+    <color name="colorPrimaryDark">#8eb9ed</color>
+    <color name="colorAccent">#c1c3f1</color>
+
+    <color name="ACTV_enabled_color">#000000</color>
+    <color name="ACTV_disabled_color">#000E2E</color>
+
+    <color name="listview_color_1">#b6c75c</color>
+    <color name="listview_color_2">#FF0000</color>
+    <color name="listview_color_3">#FF0000</color>
+    <color name="listview_color_4">#FFFFFF</color>
 </resources>

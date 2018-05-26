@@ -81,16 +81,19 @@ public class ActivityListaDetalle extends AppCompatActivity {
                 case R.id.navigation_supermercado:
                     intent = new Intent(getApplicationContext(),ActivitySuperMercadoList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.aderecha);
                     finish();
                     return true;
                 case R.id.navigation_familia:
                     intent = new Intent(getApplicationContext(),ActivityFamiliaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.aderecha);
                     finish();
                     return true;
                 case R.id.navigation_articulo:
                     intent = new Intent(getApplicationContext(),ActivityArticuloList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.aderecha);
                     finish();
                     return true;
                 case R.id.navigation_lista:
@@ -184,6 +187,13 @@ public class ActivityListaDetalle extends AppCompatActivity {
                 }
             }
         });
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.abajo, R.anim.abajo);
     }
 
     @Override
@@ -614,7 +624,7 @@ public class ActivityListaDetalle extends AppCompatActivity {
         ((Button) findViewById(R.id.buttonEliminar)).setVisibility(View.GONE);
         ((Button) findViewById(R.id.buttonModificar)).setVisibility(View.GONE);
         ((Button) findViewById(R.id.buttonGuardar)).setVisibility(View.GONE);
-        ((Button) findViewById(R.id.buttonNuevaLinea)).setVisibility(View.VISIBLE);
+        ((Button) findViewById(R.id.buttonNuevaLinea)).setVisibility(View.GONE);
         ((Button) findViewById(R.id.buttonInicioComprar)).setVisibility(View.GONE);
         ((Button) findViewById(R.id.buttonFinComprar)).setVisibility(View.VISIBLE);
         Spinner spiner = (Spinner) findViewById(R.id.spinner_supermercado);

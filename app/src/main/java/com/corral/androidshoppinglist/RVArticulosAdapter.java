@@ -23,6 +23,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -50,6 +51,7 @@ import persistencia.jb.Linea;
 import persistencia.jb.Lista;
 import persistencia.jb.OrdenArticulo;
 
+import static com.corral.androidshoppinglist.ActivityListaDetalle.REQUESTCODE_MAS_ARTICULO;
 import static util.Constantes.COLOR_CARDVIEW_COMPRADO;
 import static util.Constantes.COLOR_CARDVIEW_NO_COMPRADO;
 import static util.Constantes.COLOR_CARDVIEW_NUEVO;
@@ -63,6 +65,9 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
 
     // La lista de artículos como objeto Linea que coincide con los artículos en el Recycler.
     private static List<Linea> lineas;
+
+    // Lista para recordar que CardView están desplegadas y cuales no.
+    private static List<Boolean> lDesplegadas;
 
     // La activity puede estar en estado de introducción de artículos o en estado de marcando
     // los articulos (o sea comprando).
@@ -92,10 +97,11 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class LineaViewHolder extends RecyclerView.ViewHolder {
+    public class LineaViewHolder extends RecyclerView.ViewHolder {
 
         // Referencias a objetos para acceder posteriormente, los guardamos para cada ViewHolder.
         CardView cv;
+        LinearLayout ll;
         EditText cantidad;
         EditText descripcion;
 
@@ -127,38 +133,40 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
             thisHolder = this;
 
             cv = (CardView)itemView.findViewById(R.id.cv);
-            tvCantidad = (TextView) itemView.findViewById(R.id.lista_tv_cantidad);
-            cantidad = (EditText) itemView.findViewById(R.id.lista_item_cantidad);
-            descripcion = (EditText) itemView.findViewById(R.id.cv_descripcion);
-            articuloACTV = (AutoCompleteTextView) itemView.findViewById(R.id.autocompletetextview_item_lista_articulo);
+            ll = (LinearLayout)cv.findViewById(R.id.cv_informacion_extra);
+            tvCantidad = (TextView) cv.findViewById(R.id.lista_tv_cantidad);
+            cantidad = (EditText) cv.findViewById(R.id.lista_item_cantidad);
+            descripcion = (EditText) cv.findViewById(R.id.cv_descripcion);
+            articuloACTV = (AutoCompleteTextView) cv.findViewById(R.id.autocompletetextview_item_lista_articulo);
             articuloACTVOk = false;
-            pvp = (EditText) itemView.findViewById(R.id.cv_edit_text_pvp);
-            botonCheckCompraOff = (FloatingActionButton) itemView.findViewById(R.id.botonCheckCompraOff);
-            botonCheckCompraOn = (FloatingActionButton) itemView.findViewById(R.id.botonCheckCompraOn);
+            pvp = (EditText) cv.findViewById(R.id.cv_edit_text_pvp);
+            botonCheckCompraOff = (FloatingActionButton) cv.findViewById(R.id.botonCheckCompraOff);
+            botonCheckCompraOn = (FloatingActionButton) cv.findViewById(R.id.botonCheckCompraOn);
+
 
             if (comprando) {
                 articuloACTV.setEnabled(false);
-                LinearLayout layoutBotonCheck = (LinearLayout) itemView.findViewById(R.id.layout_boton_check);
+                LinearLayout layoutBotonCheck = (LinearLayout) cv.findViewById(R.id.layout_boton_check);
                 layoutBotonCheck.setVisibility(View.VISIBLE);
 
             } else {
                 articuloACTV.setEnabled(true);
-                LinearLayout layoutBotonCheck = (LinearLayout) itemView.findViewById(R.id.layout_boton_check);
+                LinearLayout layoutBotonCheck = (LinearLayout) cv.findViewById(R.id.layout_boton_check);
                 layoutBotonCheck.setVisibility(View.GONE);
 
             }
 
             // Al hacer click en botonMasArticulo...
             botonMasArticulo = definirBotonMasArticulo(
-                    (FloatingActionButton)itemView.findViewById(R.id.boton_articulo_nueva_articulo));
+                    (FloatingActionButton)cv.findViewById(R.id.boton_articulo_nueva_articulo));
 
             // Al hacer click en botonBorrarArticulo...
             botonBorrarArticulo = definirBotonBorrarArticulo(
-                    (FloatingActionButton)itemView.findViewById(R.id.boton_articulo_borrar_articulo));
+                    (FloatingActionButton)cv.findViewById(R.id.boton_articulo_borrar_articulo));
 
             // Al hacer click en botonDesplegarArticulo...
             botonDesplegarArticulo = definirBotonDesplegarArticulo(
-                    (FloatingActionButton)itemView.findViewById(R.id.boton_articulo_desplegar_articulo));
+                    (FloatingActionButton)cv.findViewById(R.id.boton_articulo_desplegar_articulo));
 
             // Al hacer click en botonCheckCompraOff...
             definirBotonCheckCompraOff(botonCheckCompraOff);
@@ -177,10 +185,10 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
 
             // definir el NumberPicker
             cantidadNPicker = definirNumberPicker(
-                    (Spinner)itemView.findViewById(R.id.lista_item_numberPicker));
+                    (Spinner)cv.findViewById(R.id.lista_item_numberPicker));
 
             // definir el EditText pvp
-            pvp = definirEdittextPvp((EditText)itemView.findViewById(R.id.cv_edit_text_pvp));
+            pvp = definirEdittextPvp((EditText)cv.findViewById(R.id.cv_edit_text_pvp));
 
             escogerEtONp();
         }
@@ -253,7 +261,8 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(contexto, ActivityArticuloDetalle.class);
-                    ((Activity)contexto).startActivityForResult(intent, com.corral.androidshoppinglist.ActivityListaDetalle.REQUESTCODE_MAS_ARTICULO);
+                    intent.putExtra(cv.getContext().getString(R.string.articuloRVnuevo), articuloACTV.getText().toString());
+                    ((Activity)contexto).startActivityForResult(intent, REQUESTCODE_MAS_ARTICULO);
                 }
             });
             return v;
@@ -296,20 +305,32 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
          * @return el botón
          */
         FloatingActionButton definirBotonDesplegarArticulo(FloatingActionButton v) {
-            v.setOnClickListener(new View.OnClickListener() {
+/*            v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    LinearLayout ll = (LinearLayout)cv.findViewById(R.id.cv_informacion_extra);
+
+                    Boolean estado = lDesplegadas.get(position);
+                    lDesplegadas.set(position, !b);
+                    android.support.transition.TransitionManager.beginDelayedTransition(rv);
+                    ll.setVisibility( !b? View.VISIBLE: View.GONE);
 
                     if (ll.getVisibility() == View.VISIBLE) {
+
+                        RecyclerView rv = ((RecyclerView)cv.getParent().getParent());
+                        android.support.transition.TransitionManager.beginDelayedTransition(rv);
                         ll.setVisibility(View.GONE);
 
                     } else {
+
+                        RecyclerView rv = ((RecyclerView)cv.getParent().getParent());
+                        android.support.transition.TransitionManager.beginDelayedTransition(rv);
                         ll.setVisibility(View.VISIBLE);
+
                     }
+
                 }
             });
-            return v;
+*/            return v;
         }
 
         /**
@@ -415,12 +436,25 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
             v.setThreshold(1);
             v.setAdapter(ca);
 
+            v.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View vv, boolean hasFocus) {
+                    if (hasFocus) {
+                        //v.setSingleLine(true);
+                        InputMethodManager mgr = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        mgr.showSoftInput(v, 0);
+                    } else {
+                        //v.setSingleLine(false);
+                    }
+                }
+            });
+
             v.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long rowId) {
                     Cursor cursor = ((Cursor)parent.getItemAtPosition(position));
-                    String selection = cursor.getString(cursor.getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));;
+                    String selection = cursor.getString(cursor.getColumnIndex(ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE));
                     v.setText(selection);
 
                     Long anterior = linea.getId_articulo();
@@ -439,6 +473,9 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
                                 marcarTarjetaCompletada();
                             }
                             mostrarCorrespondienteCantidad(thisHolder, linea);
+
+                            InputMethodManager mgr = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            mgr.hideSoftInputFromWindow(v.getWindowToken(), 0);
                         }
 
                     } catch (SQLiteException sqle) {
@@ -468,6 +505,7 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     articuloACTVOk = false;
+                    articuloACTV.setHint("");
                     ListAdapter c = v.getAdapter();
                     for (int i = 0; i < c.getCount(); i++) {
                         Cursor cursor = (Cursor)c.getItem(i);
@@ -549,6 +587,19 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
                 }
             });
 
+            // Al abandonar el campo
+            vv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    if (!b) {
+                        //Clear focus here from edittext
+                        ArticuloDao ad = new ArticuloDao(contexto);
+                        articulo.setDescripcion(vv.getText().toString());
+                        ad.update(articulo);
+                    }
+                }
+            });
+
             vv.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
@@ -578,6 +629,7 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
                     if(actionId== EditorInfo.IME_ACTION_DONE){
                         // mostrar el importe de la compra en el botón fin de compra
                         importeTotalABotonFin();
+                        marcarTarjetaCompletada();
                     }
                     return false;
                 }
@@ -652,6 +704,24 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
 
                 @Override
                 public void afterTextChanged(Editable s) {
+                }
+            });
+
+            // Al abandonar el campo
+            vv.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    if (!b) {
+                        LineaDao ld = new LineaDao(contexto);
+                        try {
+                            linea.setPvp(Float.parseFloat(pvp.getText().toString()));
+                            ld.update(linea);
+                        } catch (NumberFormatException pe) {
+                            linea.setPvp(0f);
+                        }
+                        // mostrar el importe de la compra en el botón fin de compra
+                        importeTotalABotonFin();
+                    }
                 }
             });
 
@@ -755,7 +825,7 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
         public void mostrarCantidadEditText() {
             cantidad.setVisibility(View.VISIBLE);
             cantidadNPicker.setVisibility(View.GONE);
-            tvCantidad.setText("peso");
+            tvCantidad.setText("peso kg");
         }
 
         /**
@@ -779,7 +849,8 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
      * @param ordenado
      * @param comprando_
      */
-    public RVArticulosAdapter(Lista lista_, Context c, Boolean ordenado, Boolean comprando_, ConstraintLayout cl) {//BottomNavigationView bnv) {
+    public RVArticulosAdapter(Lista lista_, Context c, Boolean ordenado, Boolean comprando_, ConstraintLayout cl) {
+
         contexto = c;
         bottomNavigationView = (BottomNavigationView) cl.findViewById(R.id.navigation);
         recyclerviewOrigen = (RecyclerView) cl.findViewById(R.id.recycler_view_articulos);
@@ -787,10 +858,30 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
         LineaDao ld = new LineaDao(contexto);
         OrdenArticuloDao oad = new OrdenArticuloDao(contexto);
 
+        // Si cambiamos de lista, también reiniciamos lDesplegadas
+        if ((lista != null) && (lista.getId() != lista_.getId())) {
+            lDesplegadas = null;
+        }
         lista = lista_;
+
         // obtenemos las lineas en el orden de compra a través del objeto OrdenArticuloDao
         lineas = oad.getLineasEnOrden(ld.listado(lista.getId(), null, LineaContract.LineaEntry._ID),
                 lista.getId_super(), ordenado);
+
+        // iniciamos la lista de recordatorio de estado de CardView, estado desplegado si/no.
+        if (lDesplegadas == null) { // cuando iniciamos la app o cambiamos de lista.
+            lDesplegadas = new ArrayList<Boolean>();
+            for (Linea l: lineas) {
+                lDesplegadas.add(Boolean.FALSE);
+            }
+        } else {
+            if (lDesplegadas.size() < lineas.size()) {  // cuando añadimos un CardView a la lista
+                for (Linea l: lineas) {
+                    lDesplegadas.add(Boolean.FALSE);
+                }
+            }
+        }
+
     }
 
     // Create new views (invoked by the layout manager)
@@ -808,10 +899,20 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(LineaViewHolder holder, int position) {
+    public void onBindViewHolder(LineaViewHolder holder, final int position) {
 
+        // evitamos comportamientos extraños al reutilizar los ViewHolder
+        holder.setIsRecyclable(false);
+
+        final LineaViewHolder holder_ = holder;
         holder.linea = lineas.get(position);
         holder.articulo = (new ArticuloDao(contexto)).read(holder.linea.getId_articulo());
+
+        // Si el CardView estaba desplegado, lo desplegamos o replegamos según lDesplegadas
+        Boolean estado = (lDesplegadas.size() > position)? lDesplegadas.get(position) : false;
+        android.support.transition.TransitionManager.beginDelayedTransition(holder_.cv);
+        holder_.ll.setVisibility( (estado)? View.VISIBLE: View.GONE);
+
 
         mostrarCorrespondienteCantidad(holder, holder.linea);
 
@@ -849,11 +950,26 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
         CursorAdapterArticuloReducido ca = new CursorAdapterArticuloReducido(contexto,
                 ad.getCursorReducido(null, null, null, null));
         holder.articuloACTV.setAdapter(ca);
-        if (holder.articulo != null) holder.articuloACTV.setText(holder.articulo.getNombre());
+        if (holder.articulo != null) {
+            holder.articuloACTV.setText(holder.articulo.getNombre());
+            holder.articuloACTV.setSingleLine(false);
+        }
         //setSpinnerPos(holder.articuloACTV, lineas.get(position).getId_articulo());
         
         // rellenar datos desplegables.
         holder.rellenarDatosDesplegables();
+
+        // ponemos el estado correcto de despliegue del CardView.
+        holder.botonDesplegarArticulo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Boolean estado = lDesplegadas.get(position);
+                    lDesplegadas.set(position, !estado);
+                    android.support.transition.TransitionManager.beginDelayedTransition(holder_.cv);
+                    holder_.ll.setVisibility( (!estado)? View.VISIBLE: View.GONE);
+
+                }
+        });
 
     }
 

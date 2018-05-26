@@ -11,4 +11,9 @@
     <string name="title_activity_articulo">Articulo</string>
     <string name="title_activity_lista">Listas</string>
     <string name="title_activity_prueba_main">PruebaMainActivity</string>
+    <string name="articuloRVnuevo">NOMBRE_ARTICULO_NUEVO</string>
+    <string name="lista_comenzar">Comenzar</string>
+    <string name="lista_mas_articulos">Artículos</string>
+    <string name="lista_ver_articulos">Ver Lista</string>
+    <string name="lista_detalle_comenzar">Comenzar</string>
 </resources>

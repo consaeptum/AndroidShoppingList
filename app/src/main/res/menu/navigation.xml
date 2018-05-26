@@ -9,12 +9,12 @@
     <item
         android:id="@+id/navigation_familia"
         android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="Familia" />
+        android:title="Familias" />
 
     <item
         android:id="@+id/navigation_articulo"
         android:icon="@drawable/ic_label_outline_black_24dp"
-        android:title="Artículo"
+        android:title="Artículos"
         android:checked="true"/>
 
     <item

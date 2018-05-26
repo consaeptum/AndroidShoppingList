@@ -4,34 +4,60 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/carrito_icono"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/carrito_icono"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".ActivityFamiliaList"
-            android:label="@string/title_activity_familia"
             android:exported="true"
+            android:label="@string/title_activity_familia"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ActivityFamiliaDetalle" />
-
+        <activity
+            android:name=".ActivityFamiliaDetalle"
+            android:windowSoftInputMode="stateHidden|adjustResize|adjustPan" />
         <activity
             android:name=".ActivitySuperMercadoList"
-            android:label="@string/title_activity_familia"
             android:exported="true"
+            android:label="@string/title_activity_super"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ActivitySuperMercadoDetalle" />
+        <activity
+            android:name=".ActivitySuperMercadoDetalle"
+            android:windowSoftInputMode="stateHidden|adjustResize|adjustPan" />
+        <activity
+            android:name=".ActivityListaList"
+            android:exported="true"
+            android:label="@string/title_activity_lista"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan">
 
+        </activity>
+        <activity android:name=".ActivityListaDetalle" />
         <activity
             android:name=".ActivityArticuloList"
-            android:label="@string/title_activity_familia"
             android:exported="true"
+            android:label="@string/title_activity_articulo"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan" >
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize|adjustPan">
+
         </activity>
-        <activity android:name=".ActivityArticuloDetalle" />
+
+        <activity
+            android:name=".ActivityArticuloDetalle"
+            android:windowSoftInputMode="stateHidden|adjustResize|adjustPan" />
+
+        <!-- El splash activity evita que el usuario se perciba del ColdStart -->
+        <activity
+            android:name=".SplashActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
     </application>
 

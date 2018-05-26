@@ -3,17 +3,16 @@ package com.corral.androidshoppinglist;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import persistencia.dao.FamiliaContract;
-import util.Constantes;
 
 public class CursorAdapterFamilia extends CursorAdapter {
 
@@ -31,16 +30,29 @@ public class CursorAdapterFamilia extends CursorAdapter {
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                    Animation animation1 = new AlphaAnimation(1.0f, 0.3f);
-                    animation1.setDuration(500);
-                    v.setBackgroundColor(Constantes.COLOR_LISTA_SELECCIONADA);
-                    v.startAnimation(animation1);
-                    v.setBackgroundColor(Color.WHITE);
-                }
+
+                // Animate the background color of clicked Item
+                ColorDrawable[] color = {
+                        new ColorDrawable(v.getResources().getColor(R.color.listview_color_4)),
+                        new ColorDrawable(v.getResources().getColor(R.color.listview_color_1))
+                };
+                TransitionDrawable trans = new TransitionDrawable(color);
+                v.setBackground(trans);
+                trans.startTransition(500); // duration 2 seconds
+
+                // Go back to the default background color of Item
+                ColorDrawable[] color2 = {
+                        new ColorDrawable(v.getResources().getColor(R.color.listview_color_3)),
+                        new ColorDrawable(v.getResources().getColor(R.color.listview_color_4))
+                };
+                TransitionDrawable trans2 = new TransitionDrawable(color2);
+                v.setBackground(trans2);
+                trans2.startTransition(500); // duration 2 seconds
+
                 return false;
             }
         });
+
 
         return view;
     }

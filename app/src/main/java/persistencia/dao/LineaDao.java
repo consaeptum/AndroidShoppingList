@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import persistencia.jb.Articulo;
 import persistencia.jb.Linea;
 
 /**
@@ -27,9 +28,11 @@ public class LineaDao {
      *  }
      */
     static DBHelper mDBHelper = null;
+    static Context contexto;
 
     public LineaDao(Context context) {
         if (mDBHelper == null) mDBHelper = new DBHelper(LineaContract.getInstance(), context);
+        contexto = context;
     }
 
     public void close() {
@@ -53,6 +56,7 @@ public class LineaDao {
         values.put(LineaContract.LineaEntry.COLUMN_NAME_PVP, linea.getPvp());
         values.put(LineaContract.LineaEntry.COLUMN_NAME_ID_ARTICULO, linea.getId_articulo());
         values.put(LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA, linea.getId_lista());
+        values.put(LineaContract.LineaEntry.COLUMN_NAME_COMPRADO, linea.getComprado());
 
         // Insert the new row, returning the primary key value of the new row
         // null indica no añadir la fila si values está vacío.
@@ -83,7 +87,8 @@ public class LineaDao {
                 LineaContract.LineaEntry.COLUMN_NAME_CANTIDAD,
                 LineaContract.LineaEntry.COLUMN_NAME_PVP,
                 LineaContract.LineaEntry.COLUMN_NAME_ID_ARTICULO,
-                LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA
+                LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA,
+                LineaContract.LineaEntry.COLUMN_NAME_COMPRADO
         };
 
         // Filter results WHERE "title" = 'My Title'
@@ -121,6 +126,9 @@ public class LineaDao {
             );
             f.setId_lista(
                     c.getLong(c.getColumnIndex(LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA))
+            );
+            f.setComprado(
+                    (c.getInt(c.getColumnIndex(LineaContract.LineaEntry.COLUMN_NAME_COMPRADO))==0)?false:true
             );
         }
         c.close();
@@ -161,6 +169,7 @@ public class LineaDao {
         values.put(LineaContract.LineaEntry.COLUMN_NAME_PVP, linea.getPvp());
         values.put(LineaContract.LineaEntry.COLUMN_NAME_ID_ARTICULO, linea.getId_articulo());
         values.put(LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA, linea.getId_lista());
+        values.put(LineaContract.LineaEntry.COLUMN_NAME_COMPRADO, linea.getComprado());
 
         // Which row to update, based on the title
         String selection = LineaContract.LineaEntry._ID + " = ?";
@@ -178,8 +187,8 @@ public class LineaDao {
     /**
      * Obtiene una lista de Lineas filtrado por los campos de los parametros.
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
-     * @param id_lista El código de una lista.  Si es 0 no se filtra por este campo.
-     * @param id_articulo El código de un artículo.  Si es 0 no se filtra por este campo.
+     * @param id_lista El código de una lista.  Si es null no se filtra por este campo.
+     * @param id_articulo El código de un artículo.  Si es null no se filtra por este campo.
      * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
      *               ordenado en caso contrario.
      * @return an ArrayList of Linea
@@ -196,18 +205,19 @@ public class LineaDao {
                 LineaContract.LineaEntry.COLUMN_NAME_ID_ARTICULO,
                 LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA,
                 LineaContract.LineaEntry.COLUMN_NAME_PVP,
-                LineaContract.LineaEntry.COLUMN_NAME_CANTIDAD
+                LineaContract.LineaEntry.COLUMN_NAME_CANTIDAD,
+                LineaContract.LineaEntry.COLUMN_NAME_COMPRADO
         };
 
         // Filter results WHERE
         String selection = "";
         List<String> selectionArgs = new ArrayList<>();
 
-        if (id_articulo > 0) {
+        if (id_articulo != null) {
             selection = selection.concat(LineaContract.LineaEntry.COLUMN_NAME_ID_ARTICULO + " =?");
             selectionArgs.add(id_articulo.toString());
         }
-        if (id_lista > 0) {
+        if (id_lista != null) {
             if (selection.length() > 0) selection = selection.concat(" AND ");
             selection = selection.concat(LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA + " =?");
             selectionArgs.add(id_lista.toString());
@@ -247,6 +257,9 @@ public class LineaDao {
                 linea.setPvp(
                         c.getFloat(c.getColumnIndex(LineaContract.LineaEntry.COLUMN_NAME_PVP))
                 );
+                linea.setComprado(
+                        (c.getInt(c.getColumnIndex(LineaContract.LineaEntry.COLUMN_NAME_COMPRADO))==0)?false:true
+                );
                 listLinea.add(linea);
                 c.moveToNext();
             }
@@ -258,8 +271,8 @@ public class LineaDao {
     /**
      * Obtiene un cursor de una lista de Lineas filtrado por los campos de los parametros.
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
-     * @param id_lista El código de una lista.  Si es 0 no se filtra por este campo.
-     * @param id_articulo El código de un artículo.  Si es 0 no se filtra por este campo.
+     * @param id_lista El código de una lista.  Si es null no se filtra por este campo.
+     * @param id_articulo El código de un artículo.  Si es null no se filtra por este campo.
      * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
      *               ordenado en caso contrario.
      * @return un cursor de  Linea
@@ -276,18 +289,19 @@ public class LineaDao {
                 LineaContract.LineaEntry.COLUMN_NAME_ID_ARTICULO,
                 LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA,
                 LineaContract.LineaEntry.COLUMN_NAME_PVP,
-                LineaContract.LineaEntry.COLUMN_NAME_CANTIDAD
+                LineaContract.LineaEntry.COLUMN_NAME_CANTIDAD,
+                LineaContract.LineaEntry.COLUMN_NAME_COMPRADO
         };
 
         // Filter results WHERE
         String selection = "";
         List<String> selectionArgs = new ArrayList<>();
 
-        if (id_articulo > 0) {
+        if (id_articulo != null) {
             selection = selection.concat(LineaContract.LineaEntry.COLUMN_NAME_ID_ARTICULO + " =?");
             selectionArgs.add(id_articulo.toString());
         }
-        if (id_lista > 0) {
+        if (id_lista != null) {
             if (selection.length() > 0) selection = selection.concat(" AND ");
             selection = selection.concat(LineaContract.LineaEntry.COLUMN_NAME_ID_LISTA + " =?");
             selectionArgs.add(id_lista.toString());
@@ -309,6 +323,17 @@ public class LineaDao {
             );
 
         return c;
+    }
+
+    /**
+     * Devuelve el Articulo de la línea
+     * @param linea La linea que contiene el id_artículo al que hace referencia.
+     * @return El Articulo.
+     */
+    public Articulo readArticulo(Linea linea) {
+        ArticuloDao ad = new ArticuloDao(contexto);
+        Articulo a = ad.read(linea.getId_articulo());
+        return a;
     }
 
 }

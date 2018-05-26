@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="#b2b2b3">
 
     <android.support.v7.widget.CardView
         android:id="@+id/cv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp">
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp">
 
         <LinearLayout
             android:id="@+id/layout_item_lista_articulo_visible"
@@ -49,10 +51,10 @@
                         android:clickable="true"
                         android:scaleType="fitCenter"
                         android:theme="@style/AppTheme"
-                        app:backgroundTint="#FFB8D29C"
+                        app:backgroundTint="@color/cardview_light_background"
                         app:elevation="0dp"
                         app:fabSize="mini"
-                        app:srcCompat="@mipmap/new_item" />
+                        app:srcCompat="@android:drawable/ic_input_add" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:id="@+id/boton_articulo_borrar_articulo"
@@ -133,7 +135,7 @@
                             android:layout_gravity="center_vertical|start"
                             android:layout_weight="8"
                             android:gravity="center_vertical"
-                            android:hint="escriba aquí el producto"
+                            android:hint="Escriba aquí el producto.  Si no aparece en la lista, pulse el icono +"
                             android:inputType="textCapSentences|textMultiLine"
                             android:maxLines="1"
                             android:textAlignment="gravity"
@@ -145,7 +147,6 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
                             android:layout_weight="3"
-                            android:ems="10"
                             android:enabled="true"
                             android:focusable="true"
                             android:gravity="center"
@@ -157,12 +158,12 @@
                             android:visibility="visible" />
 
                         <Spinner
+                            android:theme="@style/AppThemeSpinner"
                             android:id="@+id/lista_item_numberPicker"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:layout_weight="2"
+                            android:layout_weight="3"
                             android:visibility="visible"/>
 
                     </LinearLayout>
@@ -234,8 +235,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="left"
-                    android:hint="Para comparar el precio con otros supermercados puede anotar aquí la marca y los gramos o litros del embase. O si lo prefiere, puede crear un artículo nuevo especificando en el nombre el peso y la marca para diferenciarlo de un producto genérico."
+                    android:hint="Puede anotar aquí otras características del producto"
                     android:textAlignment="gravity"
+                    android:backgroundTint="#ebf5ff"
                     android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                     android:textStyle="italic" />
 
@@ -249,7 +251,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:gravity="right"
-                        android:textColor="#ffffff"
+                        android:textColor="#05a401"
                         android:textStyle="bold"
                         android:layout_weight="1"
                         android:text=" Precio " />
@@ -259,21 +261,21 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="2"
-                        android:foreground="@color/cardview_light_background"
+                        android:foreground="#05a401"
                         android:gravity="center_horizontal"
                         android:hint="Introduzca el precio aquí"
                         android:imeOptions="actionDone"
                         android:inputType="numberDecimal"
                         android:textAlignment="gravity"
-                        android:textColor="#ffffff"
-                        android:textColorHint="#ffffff"
+                        android:textColor="#05a401"
+                        android:textColorHint="#05a401"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:gravity="left"
-                        android:textColor="#ffffff"
+                        android:textColor="#05a401"
                         android:textStyle="bold"
                         android:layout_weight="1"
                         android:text=" € " />

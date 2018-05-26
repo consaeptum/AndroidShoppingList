@@ -37,11 +37,13 @@ public class ActivityArticuloList extends AppCompatActivity {
                 case R.id.navigation_supermercado:
                     intent = new Intent(getApplicationContext(),ActivitySuperMercadoList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.adefuera);
                     finish();
                     return true;
                 case R.id.navigation_familia:
                     intent = new Intent(getApplicationContext(),ActivityFamiliaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.adefuera);
                     finish();
                     return true;
                 case R.id.navigation_articulo:
@@ -49,6 +51,7 @@ public class ActivityArticuloList extends AppCompatActivity {
                 case R.id.navigation_lista:
                     intent = new Intent(getApplicationContext(),ActivityListaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aizquierda, R.anim.aizfuera);
                     finish();
                     return true;
             }
@@ -116,10 +119,12 @@ public class ActivityArticuloList extends AppCompatActivity {
                 Intent intent = new Intent(contexto,ActivityArticuloDetalle.class);
                 intent.putExtra("Articulo", f);
                 startActivity(intent);
+                overridePendingTransition(R.anim.arriba, R.anim.arribaba);
             }
         });
 
     }
+
 
     @Override
     protected void onResume() {

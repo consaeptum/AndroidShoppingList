@@ -53,11 +53,13 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
                 case R.id.navigation_supermercado:
                     intent = new Intent(getApplicationContext(),ActivitySuperMercadoList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.aderecha);
                     finish();
                     return true;
                 case R.id.navigation_familia:
                     intent = new Intent(getApplicationContext(),ActivityFamiliaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.aderecha);
                     finish();
                     return true;
                 case R.id.navigation_articulo:
@@ -65,6 +67,7 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
                 case R.id.navigation_lista:
                     intent = new Intent(getApplicationContext(),ActivityListaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aizquierda, R.anim.aizfuera);
                     finish();
                     return true;
             }
@@ -104,9 +107,27 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
         // si articulo null indica que no se va a modificar o eliminar porque no se envía una referencia.
         definirBotones(articulo == null);
 
+        /*
+         * Si el articulo no es nulo, es que se envió un artículo para modificar.
+         * Si se recibe el campo R.string.articuloRVnuevo es que desde lista se quiere añadir
+         * un nuevo artículo con el nombre que se le pase.
+         */
         if (articulo != null) {
             rellenaCampos(articulo);
+        } else {
+            String nombreArticulo = getIntent().getStringExtra(getString(R.string.articuloRVnuevo));
+            if (nombreArticulo != null) {
+                EditText et_nombre = (EditText) findViewById(R.id.et_articulo_nombre);
+                et_nombre.setText(nombreArticulo);
+            }
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.abajo, R.anim.abajo);
     }
 
     private void definirBotones(Boolean opcionGuardar) {

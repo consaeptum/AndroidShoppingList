@@ -2,18 +2,16 @@ package com.corral.androidshoppinglist;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import persistencia.dao.ArticuloContract;
-import util.Constantes;
 
 public class CursorAdapterArticuloReducido extends CursorAdapter {
 
@@ -28,9 +26,9 @@ public class CursorAdapterArticuloReducido extends CursorAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View view = super.getView(position, convertView, parent);
+        final View view = super.getView(position, convertView, parent);
 
-        TextView tv_list_item_articulo = (TextView) view.findViewById(R.id.list_item_articulo_reducido);
+        final TextView tv_list_item_articulo = (TextView) view.findViewById(R.id.list_item_articulo_reducido);
 
         Cursor c = getCursor();
 
@@ -40,12 +38,25 @@ public class CursorAdapterArticuloReducido extends CursorAdapter {
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Animation animation1 = new AlphaAnimation(1.0f, 0.3f);
-                animation1.setDuration(500);
-                Drawable colorAnterior = v.getBackground();
-                v.setBackgroundColor(Constantes.COLOR_LISTA_SELECCIONADA);
-                v.startAnimation(animation1);
-                v.setBackground(colorAnterior);
+
+                // Animate the background color of clicked Item
+                ColorDrawable[] color = {
+                        new ColorDrawable(contexto.getResources().getColor(R.color.listview_color_4)),
+                        new ColorDrawable(contexto.getResources().getColor(R.color.listview_color_1))
+                };
+                TransitionDrawable trans = new TransitionDrawable(color);
+                v.setBackground(trans);
+                trans.startTransition(500); // duration 2 seconds
+
+                // Go back to the default background color of Item
+                ColorDrawable[] color2 = {
+                        new ColorDrawable(contexto.getResources().getColor(R.color.listview_color_3)),
+                        new ColorDrawable(contexto.getResources().getColor(R.color.listview_color_4))
+                };
+                TransitionDrawable trans2 = new TransitionDrawable(color2);
+                v.setBackground(trans2);
+                trans2.startTransition(500); // duration 2 seconds
+
                 return false;
             }
         });

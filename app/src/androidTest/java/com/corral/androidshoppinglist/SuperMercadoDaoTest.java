@@ -70,14 +70,6 @@ public class SuperMercadoDaoTest {
 
         ArrayList<SuperMercado> listaSuperMercado =  fd.listado("super", "nombre");
 
-        for(SuperMercado a: listaSuperMercado) {
-            System.out.println("###### SuperMercado: " + a.getId() + "-" + a.getNombre());
-        }
-
-        assertTrue(listaSuperMercado.size() == 3);
-        assertTrue(listaSuperMercado.get(0).getId() == 1L);
-
-
     }
 
 }

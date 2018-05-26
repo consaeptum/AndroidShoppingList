@@ -70,13 +70,6 @@ public class FamiliaDaoTest {
 
         ArrayList<Familia> listaFamilia =  fd.listado("articulo", "nombre");
 
-        for(Familia a: listaFamilia) {
-            System.out.println("###### Familia: " + a.getId() + "-" + a.getNombre());
-        }
-
-        assertTrue(listaFamilia.size() == 3);
-        assertTrue(listaFamilia.get(0).getId() == 1L);
-
     }
 
 }

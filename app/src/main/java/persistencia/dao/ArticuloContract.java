@@ -18,6 +18,7 @@ public final class ArticuloContract implements Contract {
     public static ArticuloContract getInstance() {
         if (articuloContract == null) {
             articuloContract = new ArticuloContract();
+
         }
         return articuloContract;
     }
@@ -41,6 +42,11 @@ public final class ArticuloContract implements Contract {
     public String get_SQL_CREATE_INDEX() {
         return SQL_CREATE_INDEX;
     }
+
+    public String get_SQL_INSERTFIRST() {
+        return SQL_INSERTFIRST;
+    }
+
 
     /* Inner class that defines the table contents */
     public static class ArticuloEntry implements BaseColumns {
@@ -67,6 +73,13 @@ public final class ArticuloContract implements Contract {
                             FamiliaContract.FamiliaEntry.TABLE_NAME+
                             "("+FamiliaContract.FamiliaEntry._ID+")" +
                     " )";
+
+    public static final String SQL_INSERTFIRST = "INSERT INTO " +
+                    ArticuloEntry.TABLE_NAME + "(" +
+                    ArticuloEntry._ID + ", " +
+                    ArticuloEntry.COLUMN_NAME_NOMBRE + ", " +
+                    ArticuloEntry.COLUMN_NAME_MEDIDA + " ) VALUES " +
+                    "(0,'   -- -- -- -- -- --   ', 'U');";
 
     public static final String SQL_CREATE_INDEX =
             "CREATE UNIQUE INDEX idx_articulo_nombre ON articulo(nombre);";

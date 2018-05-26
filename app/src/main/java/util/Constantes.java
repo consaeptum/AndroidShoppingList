@@ -11,4 +11,12 @@ public class Constantes {
     public static final Character TIPO_MEDIDA_KILOGRAMOS = 'K';
     public static final Character TIPO_MEDIDA_UNIDADES = 'U';
 
+    // Los colores cebra para cualquier lista.
+    public static final int[] CEBRAS = new int[] { 0xFFC7E8F9, 0xFFFFFFFF };
+
+    public static final Integer COLOR_LISTA_SELECCIONADA = 0xFF8796E1;
+    public static final Integer COLOR_CARDVIEW_COMPRADO = 0xFFFFFFFF;
+    public static final Integer COLOR_CARDVIEW_NUEVO = 0xFFB8D29C;
+    public static final Integer COLOR_CARDVIEW_NO_COMPRADO = 0xFF82C0E7;
+
 }

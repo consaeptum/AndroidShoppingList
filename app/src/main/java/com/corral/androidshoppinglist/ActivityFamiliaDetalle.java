@@ -41,6 +41,7 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
                 case R.id.navigation_supermercado:
                     intent = new Intent(getApplicationContext(),ActivitySuperMercadoList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aderecha, R.anim.aderecha);
                     finish();
                     return true;
                 case R.id.navigation_familia:
@@ -48,11 +49,13 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
                 case R.id.navigation_articulo:
                     intent = new Intent(getApplicationContext(),ActivityArticuloList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aizquierda, R.anim.aizfuera);
                     finish();
                     return true;
                 case R.id.navigation_lista:
                     intent = new Intent(getApplicationContext(),ActivityListaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aizquierda, R.anim.aizfuera);
                     finish();
                     return true;
             }
@@ -88,6 +91,13 @@ public class ActivityFamiliaDetalle extends AppCompatActivity {
             rellenaCampos(familia);
         }
 
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.abajo, R.anim.abajo);
     }
 
     private void definirBotones(Boolean opcionGuardar) {

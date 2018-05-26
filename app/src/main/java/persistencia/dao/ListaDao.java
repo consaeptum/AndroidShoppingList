@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +50,9 @@ public class ListaDao {
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(ListaContract.ListaEntry.COLUMN_NAME_FECHA, lista.getFechaFormat());
+        values.put(ListaContract.ListaEntry.COLUMN_NAME_FECHA, lista.getFechaFormatYMD());
         values.put(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER, lista.getId_super());
+        values.put(ListaContract.ListaEntry.COLUMN_NAME_IMPORTE, lista.getImporte());
 
         // Insert the new row, returning the primary key value of the new row
         // null indica no añadir la fila si values está vacío.
@@ -79,7 +81,8 @@ public class ListaDao {
         String[] projection = {
                 ListaContract.ListaEntry._ID,
                 ListaContract.ListaEntry.COLUMN_NAME_FECHA,
-                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER
+                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER,
+                ListaContract.ListaEntry.COLUMN_NAME_IMPORTE
         };
 
         // Filter results WHERE "title" = 'My Title'
@@ -106,11 +109,14 @@ public class ListaDao {
 
             f = new Lista();
             f.setId(id);
-            f.setFechaFormat(
+            f.setFechaFormatYMD(
                     c.getString(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_FECHA))
             );
             f.setId_super(
                     c.getLong(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER))
+            );
+            f.setImporte(
+                    c.getFloat(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_IMPORTE))
             );
         }
         c.close();
@@ -147,30 +153,36 @@ public class ListaDao {
 
         // New value for one column
         ContentValues values = new ContentValues();
-        values.put(ListaContract.ListaEntry.COLUMN_NAME_FECHA, lista.getFechaFormat());
+        values.put(ListaContract.ListaEntry.COLUMN_NAME_FECHA, lista.getFechaFormatYMD());
         values.put(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER, lista.getId_super());
+        values.put(ListaContract.ListaEntry.COLUMN_NAME_IMPORTE, lista.getImporte());
 
         // Which row to update, based on the title
         String selection = ListaContract.ListaEntry._ID + " = ?";
         String[] selectionArgs = { lista.getId().toString() };
 
-        int count = db.update(
-                ListaContract.ListaEntry.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs);
-
+        int count;
+        try {
+            count = db.update(
+                    ListaContract.ListaEntry.TABLE_NAME,
+                    values,
+                    selection,
+                    selectionArgs);
+        } catch (SQLiteException sqle) {
+            count = 0;
+        }
         return count > 0;
     }
 
     /**
      * Obtiene una lista de artículos filtrado por los campos de los parametros.
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * El orden será siempre DESC.
      * @param fecha La fecha por la cual filtrar el resultado. Si es null, no se filtrará por este campo.
      *              Debe estar en formato "AAAA-MM-dd".
      * @param fechaFin La fecha tope de filtrado.  Si no es null, se filtrarán los resultados entre
      *               fecha y fecha_.  Debe estar en formato "AAAA-MM-dd".
-     * @param id_super El código de un supermercado.  Si es 0 no se filtra por este campo.
+     * @param id_super El código de un supermercado.  Si es null no se filtra por este campo.
      * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
      *               ordenado en caso contrario.
      * @return an ArrayList of Lista
@@ -185,7 +197,8 @@ public class ListaDao {
         String[] projection = {
                 ListaContract.ListaEntry._ID,
                 ListaContract.ListaEntry.COLUMN_NAME_FECHA,
-                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER
+                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER,
+                ListaContract.ListaEntry.COLUMN_NAME_IMPORTE
         };
 
         // Filter results WHERE
@@ -207,7 +220,7 @@ public class ListaDao {
             }
 
         }
-        if (id_super > 0) {
+        if (id_super != null) {
             if (selection.length() > 0) selection = selection.concat(" AND ");
             selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER + " =?");
             selectionArgs.add(id_super.toString());
@@ -216,7 +229,7 @@ public class ListaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
+            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") +" DESC" , null);
         else
             c = db.query(
                 ListaContract.ListaEntry.TABLE_NAME,  // The table to query
@@ -225,7 +238,7 @@ public class ListaDao {
                 selectionArgs.toArray(S),                   // The values for the WHERE clause
                 null,                                       // don't group the rows
                 null,                                       // don't filter by row groups
-                sortBy                                      // The sort order
+                sortBy + " DESC"                                      // The sort order
         );
 
         ArrayList<Lista> listLista = new ArrayList<Lista>();
@@ -235,12 +248,15 @@ public class ListaDao {
             while (!c.isAfterLast()) {
                 Lista lista = new Lista();
                 lista.setId(c.getLong(c.getColumnIndex(ListaContract.ListaEntry._ID)));
-                lista.setFechaFormat(
+                lista.setFechaFormatYMD(
                         c.getString(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_FECHA))
                 );
                 lista.setId_super(
                         c.getLong(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER))
                 );
+                lista.setImporte(
+                        c.getFloat(c.getColumnIndex(ListaContract.ListaEntry.COLUMN_NAME_IMPORTE))
+                        );
                 listLista.add(lista);
                 c.moveToNext();
             }
@@ -252,11 +268,12 @@ public class ListaDao {
     /**
      * Obtiene un cursor de una lista de artículos filtrado por los campos de los parametros.
      * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * El orden será siempre DESC.
      * @param fecha La fecha por la cual filtrar el resultado. Si es null, no se filtrará por este campo.
      *              Debe estar en formato "AAAA-MM-dd".
      * @param fechaFin La fecha tope de filtrado.  Si no es null, se filtrarán los resultados entre
      *               fecha y fecha_.  Debe estar en formato "AAAA-MM-dd".
-     * @param id_super El código de un supermercado.  Si es 0 no se filtra por este campo.
+     * @param id_super El código de un supermercado.  Si es null no se filtra por este campo.
      * @param sortBy null si no debe estar ordenado y el nombre del campo por el que deba estar
      *               ordenado en caso contrario.
      * @return un cursor de Lista
@@ -271,7 +288,8 @@ public class ListaDao {
         String[] projection = {
                 ListaContract.ListaEntry._ID,
                 ListaContract.ListaEntry.COLUMN_NAME_FECHA,
-                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER
+                ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER,
+                ListaContract.ListaEntry.COLUMN_NAME_IMPORTE
         };
 
         // Filter results WHERE
@@ -293,7 +311,7 @@ public class ListaDao {
             }
 
         }
-        if (id_super > 0) {
+        if (id_super != null) {
             if (selection.length() > 0) selection = selection.concat(" AND ");
             selection = selection.concat(ListaContract.ListaEntry.COLUMN_NAME_ID_SUPER + " =?");
             selectionArgs.add(id_super.toString());
@@ -302,7 +320,7 @@ public class ListaDao {
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
+            c = db.rawQuery("SELECT * FROM " + ListaContract.ListaEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") + " DESC", null);
         else
             c = db.query(
                     ListaContract.ListaEntry.TABLE_NAME,  // The table to query
@@ -311,7 +329,7 @@ public class ListaDao {
                     selectionArgs.toArray(S),                   // The values for the WHERE clause
                     null,                                       // don't group the rows
                     null,                                       // don't filter by row groups
-                    sortBy                                      // The sort order
+                    sortBy + " DESC"                                      // The sort order
             );
 
         return c;

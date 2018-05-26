@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-
 import persistencia.dao.ArticuloContract;
 import persistencia.dao.ArticuloDao;
 import persistencia.dao.DBHelper;
@@ -68,15 +66,6 @@ public class ArticuloDaoTest {
         f.setNombre("articuloPrueba3"); f.setDescripcion("desc3"); f.setMedida('l'); f.setId_familia(1L);
         assertTrue(fd.insert(f));
 
-        ArrayList<Articulo> listaArticulo =  fd.listado("articulo",null,'k',0L, "nombre");
-
-        for(Articulo a: listaArticulo) {
-            System.out.println("###### Articulo: " + a.getId() + "-" + a.getNombre() + "-" + a.getDescripcion() +
-            "-" + a.getMedida() + "-" + a.getId_familia());
-        }
-
-        assertTrue(listaArticulo.size() == 1);
-        assertTrue(listaArticulo.get(0).getId() == 2L);
     }
 
 }

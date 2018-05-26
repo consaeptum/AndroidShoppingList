@@ -1,0 +1,176 @@
+29/abr/17 [x]   ActivityListaDetalle.java al guardar una lista nueva guarda la misma fecha siempre.
+
+02/may/17 [x]   ActivityListaDetalle.java al crear nueva lista aparienciaMasLineas() pone en titleBar
+                correctamente la fecha + super, pero si editamos una lista aparienciaMasLineas() solo
+                muestra supermercado.  (fecha vacía?).
+
+02/may/17 [x]   ActivityLista.java Al seleccionar una lista mostrar botones (volver, añadir artículos,
+                eliminar) pasar directamente a la opción modificar sin que el usuario tenega que
+                especificarlo.  Al pulsar "añadir artículos" mostrar botones (volver, "más artículos").
+
+02/may/17 [x]   ActivityListaDetalle.java poblar el spinner @+id/spinner_item_lista_articulo con la
+                lista de artículos existentes.
+
+03/may/17 [x]   RVArticulosAdapter.java poblar el RecyclerView solo con el nombre del artículo y
+                guardar el artículo cada vez que se seleccione uno.
+
+03/may/17 [X]   RVArticulosAdapter.java al añadir un artículo desde ActivityListaDetalle.java, al
+                volver al elemento de la lista, RecyclerView no se actualiza y no se ve el artículo
+                recién creado, ni aparece seleccionado.
+                - solución: En RVArticulosAdapter se lanza startActivityForResult para iniciar la
+                ActivityArticuloDetalle.  Al devolver el resultado de ActivityArticuloDetalle, se
+                recibe el resultado con onActivityResult() en el activity ActivityListaDetalle el cual
+                se encarga de refrescar el RecyclerView.
+
+05/may/17 [X]   RVArticulosAdapter.java / ActivityListaDetalle.java ajustar la separación entre
+                cards.
+                - solución: LinearLayout -> height = "wrap-content"
+
+05/may/17 [X]   (EditText) itemView.findViewById(R.id.lista_item_cantidad) muestra por defecto 0.0,
+                omitirlo.  O que al empezar a escribir sobreescriba el 0.
+                - solución: EditText.setHint()
+
+05/may/17 [X]   Al introducir artículos para la lista de la compra, haría falta un nuevo botón para
+                comenzar a comprar. por ejemplo; [Volver][Más artículos][Comenzar].  Al pulsar
+                [comenzar] se ordenarían los artículos por orden habitual de supermercado  y se
+                mostrarían los botones; [Volver][Más artículos][Fin Compra].  Fin compra esperaría
+                a que introdujésemos el precio total de la compra y si pusimos el precio de todos
+                los artículos a medida que los íbamos comprando, también nos mostraría el total
+                calculado según nuestros datos.  [Más artículos] nos permitiría introducir un
+                artículo que no teníamos previsto al hacer la lista.
+
+10/may/17 [X]   Al pulsar iniciar compra debe mostrar los botones [volver][más artículos][fin Compra]
+                también debe mostrar los checkBox de cada artículo de forma que mientras se
+                introducen artículos no debe mostrarlos.
+
+13/may/17 [X]   Al escribir en algún campo BottomNavigationView se pone sobre el teclado.
+                - solución: Se quita el scrollview de activity_articulo_detalle.xml.
+
+15/may/17 [X]   Quitar los campos código de todas las vistas porque no tienen utilidad para el usuario.
+
+16/may/17 [X]   Al añadir un artículo desde la lista de la compra, si pulsamos [volver] sin
+                crear el artículo, SQLiteConstraintException: UNIQUE constraint failed:
+                linea.id_lista, linea.id_articulo (code 2067), porque intenta grabar una linea con
+                mismo código de lista y artículo.
+
+17/may/17 [X]   Cuando un artículo se ha clickado como comprado en el CheckBox, Al actualizar el
+                RecyclerView debería mostrarse también el icono de desplegar en lugar del de borrar.
+
+17/may/17 [X]   Pruebas de OrdenArtículo
+
+17/may/17 [X]   Completar botonBorrarArticulo
+
+17/may/17 [X]   Completar botonDesplegarArticulo
+
+18/may/17 [X]   Al pulsar añadir una ficha de supers, familiar, artículos o familias debería
+                ponerse el cursor directamente en el primer campo sin que fuera necesario hacer
+                click en el campo.
+                - solución: ver contenido de onResume en Activity----Detalle.
+
+18/may/17 [X]   Al escribir algo en un campo y pulsar return debería plegarse el teclado.
+                - solución: imeiOptions-ActionDone.
+
+18/may/17 [X]   En añadir artículo en la lista RVArticulosAdapter (ListadeArticulos y Cantidad) cuando
+                pulsamos comenzar compra, el artículo recién añadido desaparece.
+
+19/may/17 [X]   LineaViewHolder crear métodos definirBotonxxxxxx()... para cada botón o elemento que
+                haya que crear un método para manejar los eventos.
+
+19/may/17 [X]   Completar métodos botonBorrarArticulo y DesplegarArtículo (unas líneas más arriba)
+
+
+19/may/17 [X]   Crear una base de datos inicial con Familias y Algún artículo real típico como
+                cocacola etc.  Se crearía en la clase DBHelper en onCreate y servirán de ayuda al
+                usuario. ***************************************************************************
+
+
+19/may/17 [X]   Al seleccionar un artículo en el spinnerArtículo, si seleccionamos uno que ya estaba
+                en la lista nos da mensaje de error y si se vuelve a seleccionar se produce un
+                bucle infinito.
+                - solución: comprobar el estado de linea.getOrden antes de la operación y si
+                es ELEMENTO_MAS_RECIENTE poner spinner a posición 0 en lugar de setSpinnerPos(id_articulo).
+
+19/may/17 [X]   Sigue mostrándose sobre el teclado al desplegarse el menú action bar.
+
+21/may/17 [X]   Definir el código a realizar cuando el usuario escribe el precio de un artículo.
+
+24/may/17 [X]   En la listas de supers, familias y artículos el BottomActionMenu tapa parte del
+                último elemento.
+                - solución: android:layout_marginBottom="?android:attr/actionBarSize" en
+                content_activity_xxxxx_list.xml.
+
+24/may/17 [X]   Al hacer scroll con cualquier lista se cambian de color los elementos sin recuperar
+                el color anterior.
+                - solución: añadir; if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                y también cambiar el color de fondo a blanco al final de la animación.
+
+24/may/17 [X]   Sería mejor cambiar el color Cebra por una simple ralla grisácea de separación
+                entre elementos.
+                - solución: Al poner el fondo a color blanco queda una ralla de separación.
+
+24/may/17 [X]   Dentro de la lista de la compra, cuando se hace scroll hacia abajo, algunos elementos
+                de la parte superior se vuelve de color azulado aunque los iconos se mantienen correctos.
+
+24/may/17 [X]   El Toolbartitle a veces muestra el nombre de super incorrecto, aunque la base
+                de datos está correcta.
+                - solución:  (new SuperMercadoDao(contexto)).read(lista.getId_super()).getNombre())
+
+25/may/17 [X]   Falta la funcionalidad para calcular el total de la compra.
+
+26/may/17 [X]   Al crear nuevo artículo desde  Listas y volver sin guardar nada, la linea toma valor
+                NO_ELEMENTO_MAS_RECIENTE en lugar de continuar como ELEMENTO_MAS_RECIENTE.
+
+26/may/17 [X]   Añadir scroll a las lístas, supers, datos., artíulos.
+
+26/may/17 [X]   Poner mensaje; "Notas;  escriba aquí algo pvp
+
+26/may/17 [X]   En algún momento el botombarView no reaparece, al editar algo en el cardview.
+
+29/may/17 [X]   Al añadir artículos a la lista los Weigth de artículo, cantidad no están fijos.
+
+30/may/17 [X]   Al visualizar distintos precios de artículos, aveces se repite la línea con los
+                precios.
+                - solución: lista.removeAllItems().
+
+30/may/17 [X]   Al tocar en el EditText descripción, desaparece el botomToolbar y no vuelve a aparecer
+                si deslizamos con el dedo.
+
+30/may/17 [X]   Quitar los System.out.println.
+
+13/jun/17 [X]   Al desplegar un artículo y volver a plegarlo a veces se desajusta la posición.  Sería
+                necesario refrescar el RecyclerView cada vez que se replegue la lista.
+
+                - solución:
+
+                    RecyclerView rv = ((RecyclerView)cv.getParent().getParent());
+                    TransitionManager.beginDelayedTransition(rv, new AutoTransition());
+                    ll.setVisibility(View.GONE);
+
+                    quitar: android:animateLayoutChanges="true" de "@+id/layout_item_lista_articulo_visible"
+
+13/jun/17 [X]   El AutocompleteTextview al escribir debe ser SingleLine o MaxLine = 1, pero cuando
+                se muestra el resultado debe permitir múltiples líneas.
+
+                - solución:
+
+                    android:inputType="textCapSentences|textMultiLine"
+
+13/jun/17 [X]   Al seleccionar en cualquier lista un elemento (hacer click) hay que hacer una animación
+                con un color más vistoso.
+
+24/may/17 [ ]   Habría que mejorar el rendimiento evitando el abuso de accesos a la base de datos.
+                Se podría tener en memoria las lecturas y solo acceder para leer cuando fuera imprescindible
+                o para escribir.  Al leer podría usarse las clases JavaBeans como zona de memoria
+                para no repetir lecturas.
+
+21/jun/17   [ ] En los listados "cursor_item xxxxxx" el texto sale translucido, debe ser opaco y el
+                fondo transparente.
+
+23/jun/17   [X] Al hacer intro en cantidad kilos falta que ponga la tarjeta en azul como definitiva
+                en lugar de mantenerla en verde
+
+23/jun/17   [X] El BottomActionMenu tiene que mostrar el texto en todos los iconos. (regresión)
+                Comprobar que al descargar de GooglePlay no persiste el problema.
+
+17/may/18   [ ] Al crear un nuevo artículo mientras se añaden artículos a la lista de la compra
+                aparece un bloqueo.

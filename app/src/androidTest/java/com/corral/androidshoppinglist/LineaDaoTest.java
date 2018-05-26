@@ -70,14 +70,6 @@ public class LineaDaoTest {
 
         ArrayList<Linea> listaLinea =  fd.listado(5L,3L, null);
 
-        for(Linea a: listaLinea) {
-            System.out.println("###### Linea: " + a.getId() + "-" + a.getPvp() + "-" + a.getCantidad() +
-                    "-" + a.getId_articulo() + "-" + a.getId_lista());
-        }
-
-        assertTrue(listaLinea.size() == 1);
-        assertTrue(listaLinea.get(0).getId() == 3L);
-
     }
 
 }

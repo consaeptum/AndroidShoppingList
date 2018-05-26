@@ -74,6 +74,8 @@ public class ArticuloDao {
      */
     public Articulo read(Long id) {
 
+        if (id == null) return null;
+
         SQLiteDatabase db = mDBHelper.getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
@@ -389,10 +391,17 @@ public class ArticuloDao {
             selectionArgs.add(id_familia.toString());
         }
 
+        // debido a utilizar spinners, ponemos siempre el artículo con ID 0 como "   artículo   "
+        // así que lo omitimos para los listados, solo servirá para los spinners.
+        if (selection.length() > 0) selection = selection.concat(" AND ");
+        selection = selection.concat(ArticuloContract.ArticuloEntry._ID + " >?");
+        selectionArgs.add("0");
+
         String[] S = { "" };
         Cursor c;
         if (selection.length() == 0)
-            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
+            c = db.rawQuery("SELECT * FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME + " WHERE " +
+                    ArticuloContract.ArticuloEntry._ID + " > 0 " + ((sortBy != null)? (" ORDER BY " + sortBy):"") , null);
         else
             c = db.query(
                     ArticuloContract.ArticuloEntry.TABLE_NAME,  // The table to query
@@ -402,6 +411,80 @@ public class ArticuloDao {
                     null,                                       // don't group the rows
                     null,                                       // don't filter by row groups
                     sortBy                                      // The sort order
+            );
+
+        return c;
+    }
+
+    /**
+     * Obtiene un cusor de una lista de artículos filtrado por los campos de los parametros, pero
+     * mostrando únicamente el nombre del artículo.  Esta específicamente pensado para mostrar
+     * la lista de artículos cuando hay que seleccionar uno de ellos.
+     * Si todos los parametros son null o 0, el resultado es el listado de todos los registros.
+     * @param nombre El nombre deberá comenzar por el contenido de este parámetro para cumplir la
+     *               condición de filtrado.  Si es null, no se filtrará por este campo.
+     * @param descrip Una parte de la descripción que deberá contener los artículos seleccionados
+     *                en cualquier parte del texto. Si es null, no se filtrará por este campo.
+     * @param medida Un carácter que especifica la media (U, L, K).  Si es null o no corresponde
+     *               a U L K, no se filtrará por este campo.
+     * @param id_familia El código de una familia.  Si es null no se filtra por este campo.
+     * @return un cursor de Articulo
+     *
+     */
+    public Cursor getCursorReducido(String nombre, String descrip, Character medida, Long id_familia) {
+
+        SQLiteDatabase db = mDBHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                ArticuloContract.ArticuloEntry._ID,
+                ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE,
+        };
+
+        // Filter results WHERE
+        String selection = "";
+        List<String> selectionArgs = new ArrayList<>();
+
+        if (nombre != null) {
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE + " LIKE ?");
+            selectionArgs.add(nombre + "%");
+        }
+        if (descrip != null) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_DESCRIPCION + " LIKE ?");
+            selectionArgs.add("%" + descrip + "%");
+        }
+
+        if (medida != null) {
+            if ("ULK".indexOf(Character.toUpperCase(medida)) >= 0) {
+                if (selection.length() > 0) selection = selection.concat(" AND ");
+                selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_MEDIDA + " =?");
+                selectionArgs.add(medida.toString().toUpperCase());
+            }
+        }
+        if (id_familia != null) {
+            if (selection.length() > 0) selection = selection.concat(" AND ");
+            selection = selection.concat(ArticuloContract.ArticuloEntry.COLUMN_NAME_ID_FAMILIA + " =?");
+            selectionArgs.add(id_familia.toString());
+        }
+
+        String[] S = { "" };
+        Cursor c;
+        if (selection.length() == 0)
+            c = db.rawQuery("SELECT " + ArticuloContract.ArticuloEntry._ID +
+                    "," +ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE +
+                    " FROM " + ArticuloContract.ArticuloEntry.TABLE_NAME +
+                    " ORDER BY " + ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE , null);
+        else
+            c = db.query(
+                    ArticuloContract.ArticuloEntry.TABLE_NAME,  // The table to query
+                    projection,                                 // The columns to return
+                    selection,                                  // The columns for the WHERE clause
+                    selectionArgs.toArray(S),                   // The values for the WHERE clause
+                    null,                                       // don't group the rows
+                    null,                                       // don't filter by row groups
+                    ArticuloContract.ArticuloEntry.COLUMN_NAME_NOMBRE   // The sort order
             );
 
         return c;

@@ -48,6 +48,7 @@ public final class ListaContract implements Contract {
         public static final String TABLE_NAME = "Lista";
         public static final String COLUMN_NAME_ID_SUPER = "id_super";
         public static final String COLUMN_NAME_FECHA = "fecha";
+        public static final String COLUMN_NAME_IMPORTE = "importe";
     }
 
     public static final String TEXT_TYPE = " TEXT";
@@ -59,13 +60,14 @@ public final class ListaContract implements Contract {
                     ListaEntry._ID + " INTEGER PRIMARY KEY," +
                     ListaEntry.COLUMN_NAME_ID_SUPER + INTEGER_TYPE + COMMA_SEP +
                     ListaEntry.COLUMN_NAME_FECHA + INTEGER_TYPE + NOTNULL + COMMA_SEP +
+                    ListaEntry.COLUMN_NAME_IMPORTE + INTEGER_TYPE + COMMA_SEP +
                         " FOREIGN KEY ("+ListaEntry.COLUMN_NAME_ID_SUPER+") REFERENCES "+
                             SuperMercadoContract.SuperMercadoEntry.TABLE_NAME+
                             "("+SuperMercadoContract.SuperMercadoEntry._ID+")" +
                     " )";
 
     public static final String SQL_CREATE_INDEX =
-            "CREATE UNIQUE INDEX idx_lista_fecha ON lista(fecha);";
+            "CREATE UNIQUE INDEX idx_lista_fecha_super ON lista(fecha, id_super);";
 
     public static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + ListaEntry.TABLE_NAME;

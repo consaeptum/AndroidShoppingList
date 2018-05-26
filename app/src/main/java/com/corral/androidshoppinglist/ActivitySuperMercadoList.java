@@ -38,16 +38,19 @@ public class ActivitySuperMercadoList extends AppCompatActivity {
                 case R.id.navigation_familia:
                     intent = new Intent(getApplicationContext(),ActivityFamiliaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aizquierda, R.anim.aizfuera);
                     finish();
                     return true;
                 case R.id.navigation_articulo:
                     intent = new Intent(getApplicationContext(),ActivityArticuloList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aizquierda, R.anim.aizfuera);
                     finish();
                     return true;
                 case R.id.navigation_lista:
                     intent = new Intent(getApplicationContext(),ActivityListaList.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.aizquierda, R.anim.aizfuera);
                     finish();
                     return true;
             }
@@ -102,6 +105,7 @@ public class ActivitySuperMercadoList extends AppCompatActivity {
                 Intent intent = new Intent(contexto,ActivitySuperMercadoDetalle.class);
                 intent.putExtra("SuperMercado", f);
                 startActivity(intent);
+                overridePendingTransition(R.anim.arriba, R.anim.arribaba);
             }
         });
 

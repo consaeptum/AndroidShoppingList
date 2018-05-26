@@ -13,12 +13,19 @@ public class Linea implements java.io.Serializable {
     private Float cantidad;
     private Float pvp;
 
+    // El orden de cada línea en el super.  No se guardará, uso temporal.
+    private Integer orden;
+
+    // Si la línea está marcado como comprado o por comprar.
+    private Boolean comprado;
+
     public Linea() {
         id = 0L;
         id_lista = 0L;
         id_articulo = 0L;
         cantidad = 0.0f;
         pvp = 0.0f;
+        orden = 0;
     }
 
     public Long getId() {
@@ -60,4 +67,22 @@ public class Linea implements java.io.Serializable {
     public void setPvp(Float pvp) {
         this.pvp = pvp;
     }
+
+    public Integer getOrden() {
+        return orden;
+    }
+
+    public void setOrden(Integer orden) {
+        this.orden = orden;
+    }
+
+    public Boolean getComprado() {
+        return comprado;
+    }
+
+    public void setComprado(Boolean comprado) {
+        this.comprado = comprado;
+    }
+
+
 }

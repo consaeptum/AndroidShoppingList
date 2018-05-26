@@ -50,10 +50,12 @@ public final class LineaContract implements Contract {
         public static final String COLUMN_NAME_ID_LISTA = "id_lista";
         public static final String COLUMN_NAME_CANTIDAD = "cantidad";
         public static final String COLUMN_NAME_PVP = "pvp";
+        public static final String COLUMN_NAME_COMPRADO = "comprado";
     }
 
     public static final String TEXT_TYPE = " TEXT";
     public static final String INTEGER_TYPE = " INTEGER";
+    public static final String BOOLEAN_TYPE = " BOOLEAN";
     public static final String UNIQUE_NOTNULL = " UNIQUE NOT NULL";
     public static final String COMMA_SEP = ",";
     public static final String SQL_CREATE_ENTRIES =
@@ -63,6 +65,7 @@ public final class LineaContract implements Contract {
                     LineaEntry.COLUMN_NAME_ID_LISTA + INTEGER_TYPE + COMMA_SEP +
                     LineaEntry.COLUMN_NAME_CANTIDAD + INTEGER_TYPE + COMMA_SEP +
                     LineaEntry.COLUMN_NAME_PVP + INTEGER_TYPE + COMMA_SEP +
+                    LineaEntry.COLUMN_NAME_COMPRADO + BOOLEAN_TYPE + COMMA_SEP +
                         " FOREIGN KEY ("+ LineaEntry.COLUMN_NAME_ID_LISTA+") REFERENCES "+
                             ListaContract.ListaEntry.TABLE_NAME+
                             "("+ListaContract.ListaEntry._ID+")" + COMMA_SEP +

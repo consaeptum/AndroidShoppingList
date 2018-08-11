@@ -260,6 +260,13 @@ public class RVArticulosAdapter extends RecyclerView.Adapter<RVArticulosAdapter.
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    // si no ponemos la línea a ELEMENTO_MAS_RECIENTE, luego no lo encuentra en caso
+                    // de haber modificado el artículo seleccionado.
+                    linea.setOrden(ELEMENTO_MAS_RECIENTE);
+                    LineaDao ld = new LineaDao(contexto);
+                    ld.update(linea);
+
                     Intent intent = new Intent(contexto, ActivityArticuloDetalle.class);
                     intent.putExtra(cv.getContext().getString(R.string.articuloRVnuevo), articuloACTV.getText().toString());
                     ((Activity)contexto).startActivityForResult(intent, REQUESTCODE_MAS_ARTICULO);

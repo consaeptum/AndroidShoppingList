@@ -232,6 +232,7 @@ public class ActivityArticuloDetalle extends AppCompatActivity {
                     try {
                         articulo = obtenCampos();
                         fd.update(articulo);
+
                     } catch (SQLiteException sqlce) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
                         builder

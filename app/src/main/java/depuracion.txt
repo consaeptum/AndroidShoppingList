@@ -172,5 +172,34 @@
 23/jun/17   [X] El BottomActionMenu tiene que mostrar el texto en todos los iconos. (regresión)
                 Comprobar que al descargar de GooglePlay no persiste el problema.
 
-17/may/18   [ ] Al crear un nuevo artículo mientras se añaden artículos a la lista de la compra
-                aparece un bloqueo.
+17/may/18   [X] Al buscar un artículo de la lista incremental (mientra se está añadiendo un
+                artículo ) y seleccionarlo, si a continuación intentamos crear uno nuevo con el
+                icono +, se produce un error al pulsar en guardar (parece que al intentar guardar
+                un nuevo artículo con el código del artículo seleccionado inicialmente, se produce
+                error de ID duplicado).
+                Se podría solucionar provocando que si el nombre del artículo a cambiado después
+                de haberlo seleccionado de la lista, cree uno nuevo olvidando el seleccionado, y
+                en caso contrario lo modifique. (por que puede pasar que el usuario haya borrado
+                algún carácter y después lo hubiera dejado como estaba).
+                Si lo que ocurre es que cuando se hace click en guardar el nuevo artículo, permanece
+                el ID del artículo seleccionado, se solucionaría simplemente poniendo un nuevo ID.
+
+                Se solucionó poniendo a ELEMENTO_MAS_RECIENTE la línea actual, ya que al llegar a
+                RVArticulosAdapter.getElementActual, no encontraba el elemento más reciente tras
+                haber pulsado el icono '+'
+
+                FloatingActionButton definirBotonMasArticulo(FloatingActionButton v) {
+                    v.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            linea.setOrden(ELEMENTO_MAS_RECIENTE);
+                            LineaDao ld = new LineaDao(contexto);
+                            ld.update(linea);
+
+
+05/ago/18   [ ] Cuando se borra el último elemento de la lista de artículos de la lista de la compra
+                se sigue viendo en pantalla, aunque al salir y volver a entrar, ya no se ve.
+
+05/ago/18   [X] Falta comprobar por unos días el funcionamiento del error del 17/may/18 y después
+                publicar la corrección en Google Play.

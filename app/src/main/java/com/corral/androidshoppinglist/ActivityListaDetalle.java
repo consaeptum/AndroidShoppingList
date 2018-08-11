@@ -492,8 +492,10 @@ public class ActivityListaDetalle extends AppCompatActivity {
                 // actualizarse Recyclerview aparezca por defecto el artículo seleccionado.
                 Integer articuloId = resultCode;
                 LineaDao ld = new LineaDao(contexto);
-                Linea l = ld.read(((RVArticulosAdapter)rv.getAdapter()).getElemActual());
+                Long n = ((RVArticulosAdapter) rv.getAdapter()).getElemActual();
+                Linea l = ld.read(n);
 
+                // error:  l llega como null al añadir artículo desde lista de la compra
                 l.setId_articulo(articuloId.longValue());
                 ld.update(l);
                 RecyclerView.Adapter mAdapter = new RVArticulosAdapter(lista, contexto, false, comprando, (ConstraintLayout) findViewById(R.id.origen));
